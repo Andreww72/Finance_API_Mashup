@@ -1,25 +1,22 @@
 const express = require('express');
-const fs = require('fs');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
 const flickrRouter = require('./routes/flickr');
 
 const app = express();
 
-const hostname = '127.0.0.1';
-const port = 3000;
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
-    res.writeHead(200,{'content-type': 'text/html'});
-    fs.readFile('index.html', 'utf-8', (err, data) => {
-        if (err) {
-            res.end('Could not find index.html');
-        } else {
-            res.end(data);
-        }
-    });
-});
-
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
 app.use('/search?', flickrRouter); 
 
-app.listen(port, function () {
-    console.log(`Express app listening at http://${hostname}:${port}/`);
-});
+module.exports = app;
