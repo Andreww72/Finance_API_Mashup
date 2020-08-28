@@ -1,15 +1,56 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Flickr Demo</title>
-    </head>
-    <body>
-        <h1>The Flickr API Demo</h1>
-        Usage: http://localhost:3000/search/query/number <br>
-        <ul>
-            <li>query - corresponds to Flickr tags</li>
-            <li>number - max number of results returned</li>
-            <li>Example: <a href="http://localhost:3000/search/goldenretriever/100">http://localhost:3000/search/golden-retriever/100</a></li>
-        </ul>
-    </body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+
+    <title>My Expenses Sheet</title>
+  </head>
+
+  <body>
+    <h1>Expenses Application</h1>
+
+    <div class="total">
+        Billing Amount <strong>$<span data-bind="text: total"></span></strong>	
+    </div>
+
+    <div class="row-title">
+        <div class="col">
+            Description 
+        </div>
+        <div class="col-time">
+            Time
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div data-bind="foreach: expenses">
+        <div class="row" >
+            <div class="col">
+                <span data-bind="text: desc"></span>
+            </div>
+            <div class="col-time">
+                <span data-bind="text: time"></span>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+
+    <h1>Add Expense</h1>
+    <input type="text" id="desc" placeholder="Description" />
+    <input type="text" id="time" placeholder="Time Spent" />
+    <input type="button" data-bind="click: addExpense" value="Add" />
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="javascripts/jquery-3.5.1.slim.min.js"></script>
+    <script src="javascripts/bootstrap.min.js"></script>
+    <script src="javascripts/knockout-3.5.1.js"></script>
+    <script src="javascripts/page.js"></script>
+</body>
 </html>
