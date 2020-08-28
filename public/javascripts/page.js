@@ -3,7 +3,7 @@ const Expense = function(data) {
     this.time = ko.observable(data.time);
     
     this.addToDB = async function() {
-        const response = await fetch("/api/expenses/", {
+        const response = await fetch("/api/expenses", {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -36,7 +36,7 @@ const ExpensesViewModel = function() {
         return (total*hourly_rate).toFixed(2);
     })
 
-    self.addExpense = function(){
+    self.addExpense = function() {
         const expense = new Expense({
             desc: $('#desc').val(),
             time: $('#time').val()
@@ -47,7 +47,7 @@ const ExpensesViewModel = function() {
     
     const refresh = async function() {
 
-        const response = await fetch("/api/expenses/");
+        const response = await fetch("/api/expenses");
         let data = await response.json();
 
         if (response.status === 200) {
