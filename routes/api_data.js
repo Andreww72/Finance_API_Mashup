@@ -14,7 +14,9 @@ const iex = {
 
 const news = {
     key: "f7bf34ce452b45749f2cb86581c09506",
-    hostname: "newsapi.org/api/"
+    hostname: "https://newsapi.org",
+    path_top: "/v2/top-headlines",
+    path_search: "/v2/everything"
 }
 
 let db = [];
@@ -53,6 +55,27 @@ router.get('/stock/:stock', (req, res) => {
     });
 });
 
+router.get('/news_top/:country', (req, res) => {
+    const url = `${news.hostname}${news.path_top}?country=${req.params.country}&category=business&apiKey=${news.key}`;
+    
+    axios.get(url).then((response) => {
+        res.end(JSON.stringify(response.data));
+    }).catch((error) => {
+        console.error(error);
+    });
+});
+
+router.get('/news_search/:search', (req, res) => {
+    const url = `{news.hostname}${news.path_top}?q=${req.params.search}&apiKey=${news.key}`
+
+    axios.get(url).then((response) => {
+        res.end(JSON.stringify(response.data));
+    }).catch((error) => {
+        console.error(error);
+    });
+});
+
+// Knockout example
 router.get("/expenses", function(req, res){
     res.json(200, db);
 });
