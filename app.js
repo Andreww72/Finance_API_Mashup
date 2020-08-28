@@ -23,8 +23,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/stocks', stockNews);
-app.use('/news', parseNews); 
+app.use('/api/stocks', stockNews);
+app.use('/api/news', parseNews); 
 
 
 var db = [];
