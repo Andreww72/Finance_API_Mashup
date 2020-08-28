@@ -2,12 +2,19 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const redis = require('redis');
 
 const indexRouter = require('./routes/index');
 const stockNews = require('./routes/stock_news');
 const parseNews = require('./routes/parse_news');
 
 const app = express();
+
+// Remember to install redis on container and systemctl enable + start it
+const redisClient = redis.createClient();
+redisClient.on('error', (err) => {
+	console.log("Error " + err);
+});
 
 app.use(logger('dev'));
 app.use(express.json());
