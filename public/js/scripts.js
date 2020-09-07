@@ -1,72 +1,66 @@
-// Imports
-
 // Knockout viewmodel
-const ExpensesViewModel = function() {
+const ViewModel = function() {
     const self = this;
-    self.expenses = ko.observableArray();
+    self.limitLength = 10;
+    self.showNews = ko.observable(false);
+    self.showStocks = ko.observable(false);
 
-    const Expense = function(data) {
-        this.desc = ko.observable(data.desc);
-        this.time = ko.observable(data.time);
-      
-        this.addToDB = async function() {
-            const response = await fetch("/api/expenses", {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    desc : this.desc(),
-                    time : this.time()
-                })
-            });
-
-            let data = await response.json();
-            if (response.status === 200) {
-                console.log(data);
-                viewModel.expenses.push(new Expense({
-                    desc: data.desc,
-                    time: data.time
-                }));                    
-            }
+    // Mock data
+    self.newsList = ko.observableArray([
+        {
+            image: "https://s.marketwatch.com/public/resources/images/MW-IN950_shangh_ZG_20200906232354.jpg",
+            title: "SMIC slumps, SoftBank drops in mixed Asia markets",
+            source: "MarketWatch",
+            date: "2020-09-07",
+            link: "https://www.marketwatch.com/story/asian-markets-mixed-as-china-export-data-offsets-impact-of-wall-streets-retreat-2020-09-06"},
+        {
+            image: "https://image.cnbcfm.com/api/v1/image/106297479-1576462131957gettyimages-943704498.jpeg?v=1599438225",
+            title: "China says August exports beat expectations, jumping 9.5% from a year ago",
+            source: "CNBC News",
+            date: "2020-09-07",
+            link: "https://www.cnbc.com/2020/09/07/china-trade-exports-imports-in-august-2020.html"
+        },
+        {
+            image: "https://static.foxnews.com/foxnews.com/content/uploads/2018/09/USSNimitzFeatured.jpg",
+            title: "Search underway in Arabian Sea for missing US Navy sailor: report",
+            source: "Fox News",
+            date: "2020-09-07",
+            link: "https://www.foxnews.com/world/search-underway-in-northern-arabian-sea-for-missing-us-navy-sailor"
         }
-    }
+    ]);
 
-    self.total = ko.computed(function(){
-        let total = 0;
-        const hourly_rate = 100;
-        for (let p = 0; p < self.expenses().length; p++) {
-            total += parseFloat(self.expenses()[p].time());
-        }
-        return (total*hourly_rate).toFixed(2);
-    })
+    self.stocksList = ko.observableArray([
+        {title: 'Stock listing A', date: "05/09/2020"},
+        {title: 'Stock listing B', date: "06/09/2020"},
+        {title: 'Stock listing C', date: "07/09/2020"}
+    ]);
 
-    self.addExpense = function() {
-        const expense = new Expense({
-            desc: $('#desc').val(),
-            time: $('#time').val()
-        });
+    // Clickables
+    self.getNews = function() {
+        // Get user input
 
-        expense.addToDB();
-    }
-    
-    const refresh = async function() {
 
-        const response = await fetch("/api/expenses");
-        let data = await response.json();
+        // Call server route
 
-        if (response.status === 200) {
-            for (let i = 0; i < data.length; i++) {
-                self.expenses.push(new Expense(data[i]));
-            }
-        } else {
-            console.log("Request failed: " + textStatus);
-        }
-    }
-    //refresh immediately to load initial data
-    refresh();
+
+        // Display what server returns
+        self.showNews(true);
+        self.showStocks(false);
+    };
+
+    self.getStocks = function() {
+        // Get user input
+
+        // Call server route
+
+        // Display what server returns
+        self.showNews(false);
+        self.showStocks(true);
+    };
 };
 
-const viewModel = new ExpensesViewModel();
+// Create view model and bindings
 $(function() {
     "use strict";
-	ko.applyBindings(viewModel);
-})
+	ko.applyBindings(new ViewModel());
+});

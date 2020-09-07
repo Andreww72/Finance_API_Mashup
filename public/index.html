@@ -27,81 +27,113 @@
                 <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
                 <li class="nav-item"><a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a></li>
             </ul>
-
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
         </div>
     </nav>
 
     <main role="main">
         <div class="jumbotron">
             <div class="container">
-                <h1 class="display-3">Title here!</h1>
-                <p>This is a template for a simple marketing or informational website. It includes a large callout called a jumbotron and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
-                <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+                <h1 class="display-2">Finance API Mashup</h1>
+                <p>Descibe purpose and how to use it here</p>
             </div>
         </div>
 
+        <!-- User control section -->
         <div class="container">
-            <!-- Example row of columns -->
             <div class="row">
-                <div class="col-md-4">
-                    <h2>Heading</h2>
-                    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                    <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
+                <div class="col-md-6">
+                    <h2>Use case 1</h2>
+                    <p>Short description</p>
+
+                    <label for="collection">Collection:</label>
+                    <select name="collection" id="collection">
+                        <option value="gains">Top gains</option>
+                        <option value="losses">Top losses</option>
+                        <option value="active">Most active</option>
+                        <option value="volume">Highest volume</option>
+                        <option value="percent">Highest percent</option>
+                    </select>
+                    
+                    </br>
+                    <label for="listlimit">List limit:</label>
+                    <select name="listlimit" id="listlimit">
+                        <!-- ko foreach: new Array(limitLength) -->
+                            <option data-bind="text: $index()+1, attr: { value: $index()+1 }"></option>
+                        <!-- /ko -->
+                    </select>
+
+                    <p><a class="btn btn-secondary" role="button" data-bind="click: getNews">Get latest news &raquo;</a></p>
                 </div>
-                <div class="col-md-4">
-                    <h2>Heading</h2>
-                    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                    <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
-                </div>
-                <div class="col-md-4">
-                    <h2>Heading</h2>
-                    <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-                    <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
+                <div class="col-md-6">
+                    <h2>Use case 2</h2>
+                    <p>Short description</p>
+                    <p>User option one</p>
+                    <p>User option two</p>
+                    <p><a class="btn btn-secondary" role="button" data-bind="click: getStocks">Get trending stocks &raquo;</a></p>
                 </div>
             </div>
             <hr>
         </div>
     </main>
 
+    <!-- Display results section -->
     <div class="container">
-        <h2>Expenses Application</h2>
-        <div class="total">
-            Billing Amount <strong>$<span data-bind="text: total"></span></strong>	
-        </div>
+        <h2>Results</h2>
 
-        <div class="row-title">
-            <div class="col">
-                Description 
-            </div>
-            <div class="col-time">
-                Time
-            </div>
-            <div class="clear"></div>
-        </div>
+        <!-- ko ifnot: showNews || showStocks -->
+            <p>Your results will display here</p>
+        <!-- /ko -->
 
-        <div data-bind="foreach: expenses">
-            <div class="row" >
-                <div class="col">
-                    <span data-bind="text: desc"></span>
-                </div>
-                <div class="col-time">
-                    <span data-bind="text: time"></span>
-                </div>
-                <div class="clear"></div>
+
+        <!-- ko if: showNews -->
+            <p>Showing news case</p>
+
+            <div class="row-title">
+                <div class="col col-md-3">Image</div>
+                <div class="col col-md-5">Title</div>
+                <div class="col col-md-2">Source</div>
+                <div class="col col-md-2">Date</div>
             </div>
-        </div>
-        
-        <br/>
-        <h4>Add Expense</h4>
-        <input type="text" id="desc" placeholder="Description" />
-        <input type="text" id="time" placeholder="Time Spent" />
-        <input type="button" data-bind="click: addExpense" value="Add" />
+
+            <div data-bind="foreach: newsList">
+                <div class="row">
+                    <div class="col col-md-3">
+                        <span><a data-bind=" attr: { href: link}" target="_blank"><img data-bind="attr: { src: image, alt: image }"></a></span>
+                    </div>
+                    <div class="col col-md-5">
+                        <span data-bind="text: title"></span>
+                    </div>
+                    <div class="col col-md-2">
+                        <span data-bind="text: source"></span>
+                    </div>
+                    <div class="col col-md-2">
+                        <span data-bind="text: date"></span>
+                    </div>
+                </div>
+            </div>
+        <!-- /ko -->
+
+        <!-- ko if: showStocks -->
+            <p>Showing stocks case</p>
+            <div class="row-title">
+                <div class="col-title">Article Title</div>
+                <div class="col-date">Date</div>
+            </div>
+
+            <div data-bind="foreach: stocksList">
+                <div class="row" >
+                    <div class="col-title">
+                        <span data-bind="text: title"></span>
+                    </div>
+                    <div class="col-date">
+                        <span data-bind="text: date"></span>
+                    </div>
+                </div>
+            </div>
+        <!-- /ko -->
     </div>
     <br/>
+
 </body>
 
 <footer class="container"><p>Andew Mather n9713671 2020</p></footer>
