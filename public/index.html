@@ -15,15 +15,15 @@
 </head>
 
 <body>
-    <div class="header">
-        <div class="container margins">
+    <div class="jumbotron">
+        <div class="container">
             <h1 class="display-3">Finance API Mashup</h1>
             <p>Describe purpose and how to use it here</p>
         </div>
     </div>
 
     <!-- User control section -->
-    <div class="container margins">
+    <div class="container">
         <div class="row">
             <div class="col-md">
                 <h2>Trending stock news</h2>
@@ -36,7 +36,7 @@
                         </tr>
                         <tr>
                             <td><label class="tableLabel">Stock limit:</label></td>
-                            <td><select class="list" data-bind="options: limits, value: selectListLimit"></select></td>
+                            <td><select class="list" data-bind="options: limits, value: selectStockLimit"></select></td>
                         </tr>
                         <tr>
                             <td><label class="tableLabel addASpace">Article limit:</label></td>
@@ -45,84 +45,94 @@
                     </tbody>
                 </table>
                 <br>
-                <p><a class="btn btn-secondary" role="button" data-bind="click: getNews">Get latest news &raquo;</a></p>
+                <p><a class="btn btn-secondary" role="button" data-bind="click: getTopStocks">Get trending stocks &raquo;</a></p>
             </div>
             <div class="col-md">
                 <h2>Use case 2</h2>
                 <p>Short description</p>
                 <p>User option one</p>
                 <p>User option two</p>
-                <p><a class="btn btn-secondary" role="button" data-bind="click: getStocks">Get trending stocks &raquo;</a></p>
+                <p><a class="btn btn-secondary" role="button" data-bind="click: getCase2">Get trending stocks &raquo;</a></p>
             </div>
         </div>
         <hr>
     </div>
 
     <!-- Display results section -->
-    <div class="container margins">
-        <h2>Results</h2>
+    <div class="container">
+        <h3>Results</h3>
 
-        <p data-bind="ifnot: showNews() || showStocks() || loading()">Your results will display here</p>
-        <p data-bind="if: loading">Loading...</p>
+        <p data-bind="ifnot: showStocks() || showCase2() || loading()">Your results will display here</p>
+        
+        <!-- Use case 1 -->
+        <!-- ko if: showStocks -->
+            <h4 data-bind="text: 'Trending Stocks ' + selectCollection"></h4>
+
+            <table class="table">
+                <thead>
+                    <tr class="row-title">
+                        <td>Symbol</td>
+                        <td>Company</td>
+                        <td>Exchange</td>
+                        <td>Price</td>
+                        <td>Change</td>
+                        <td>Change %</td>
+                        <td>Volume</td>
+                        <td>Date</td>
+                        <td>Button</td>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: stocksList">
+                    <tr>
+                        <td data-bind="text: symbol"></td>
+                        <td data-bind="text: name"></td>
+                        <td data-bind="text: exchange"></td>
+                        <td data-bind="text: price"></td>
+                        <td data-bind="text: change"></td>
+                        <td data-bind="text: changePercent"></td>
+                        <td data-bind="text: volume"></td>
+                        <td data-bind="text: time"></td>
+                        <td><a class="btn btn-secondary" role="button" data-bind="click: $parent.getStockNews">Get news &raquo;</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><a class="btn btn-secondary" role="button" data-bind="click: clearNews">Clear news &raquo;</a></p>
+        <!-- /ko -->
 
         <!-- ko if: showNews -->
-            <p>Trending stock news</p>
+            <h4>Trending News</h4>
 
-            <div class="row-title">
-                <div class="col col-md-1">Stock</div>
-                <div class="col col-md-1"><span data-bind="text: selectCollection"></span></div>
-                <div class="col col-md-3">Cover</div>
-                <div class="col col-md-4">Article</div>
-                <div class="col col-md-2">Source</div>
-                <div class="col col-md-1">Date</div>
-            </div>
-
-            <div data-bind="foreach: newsList">
-                <!-- ko foreach: news -->
-                    <div class="row">
-                        <div class="col col-md-1">
-                            <span data-bind="text: $parent.name + ' (' + $parent.symbol + ')'"></span>
-                        </div>
-                        <div class="col col-md-1">
-                            <span data-bind="text: $parent.price"></span>
-                        </div>
-                        <div class="col col-md-3">
-                            <span><img data-bind="attr: { src: urlToImage, alt: 'Article cover image' }"></a></span>
-                        </div>
-                        <div class="col col-md-4">
-                            <span><a data-bind="text: title, attr: { href: url}" target="_blank"></a></span>
-                            <br>
+            <table class="table">
+                <thead>
+                    <tr class="row-title">
+                        <td>Company</td>
+                        <td>Cover</td>
+                        <td>Article</td>
+                        <td>Source</td>
+                        <td>Date</td>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: newsList">
+                    <tr>
+                        <td data-bind="text: name"></td>
+                        <td><img class="articleImg" data-bind="attr: { src: urlToImage, alt: 'Article cover image' }"></td>
+                        <td>
+                            <a data-bind="text: title, attr: { href: url}" target="_blank"></a>
                             <span data-bind="text: description"></span>
-                        </div>
-                        <div class="col col-md-2">
-                            <span data-bind="text: source"></span>
-                        </div>
-                        <div class="col col-md-1">
-                            <span data-bind="text: publishedAt"></span>
-                        </div>
-                    </div>
-                <!-- /ko -->
-            </div>
+                        </td>
+                        <td data-bind="text: source"></td>
+                        <td data-bind="text: publishedAt"></td>
+                    </tr>
+                </tbody>
+            </table>
         <!-- /ko -->
 
-        <!-- ko if: showStocks -->
-            <p>Use case 2</p>
-            <div class="row-title">
-                <div class="col-title">Article Title</div>
-                <div class="col-date">Date</div>
-            </div>
-
-            <div data-bind="foreach: stocksList">
-                <div class="row" >
-                    <div class="col-title col-md-6">
-                        <span data-bind="text: title"></span>
-                    </div>
-                    <div class="col-date col-md-6">
-                        <span data-bind="text: date"></span>
-                    </div>
-                </div>
-            </div>
+        <!-- Use case 2 -->
+        <!-- ko if: showCase2 -->
+            <p>Use case 2 stuff</p>
         <!-- /ko -->
+
+        <p data-bind="if: loading">Loading...</p>
     </div>
     <br/>
 

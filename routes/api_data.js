@@ -3,6 +3,7 @@ const axios = require('axios');
 const logger = require('morgan');
 const { response } = require('express');
 const router = express.Router();
+router.use(logger('tiny'));
 
 const iex = {
     key_prod: "pk_01dff3cecba84f319d83cd2f8176b098",
@@ -20,13 +21,9 @@ const news = {
     path_search: "/v2/everything"
 }
 
-router.use(logger('tiny'));
 
-router.get("/", function(req, res){
-    res.end("${hostname}${path}}${options}?token=${key}");
-});
-
-router.get('/list/:list/:listLimit/:articleLimit', (req, res) => {
+// Use case 1
+router.get('/list/:list/:listLimit', (req, res) => {
     const mapList = {Gains: "gainers", Losses: "losers", Active: "mostactive", Volume: "iexvolume", Percent: "iexpercent"};
     const url = `${iex.hostname_test}${iex.path_list}${mapList[req.params.list]}?token=${iex.key_test}&listLimit=${req.params.listLimit}`;
 
@@ -34,7 +31,7 @@ router.get('/list/:list/:listLimit/:articleLimit', (req, res) => {
         // Receive data from first API (IEX Cloud)
         const data = response.data;
 
-        // Take desired data
+        // Add stock data to return client
         resData = [];
         for (let i in data) {
             item = {};
@@ -47,26 +44,6 @@ router.get('/list/:list/:listLimit/:articleLimit', (req, res) => {
             item.volume = data[i].volume;
             item.change = data[i].change;
             item.changePercent = data[i].changePercent;
-
-            // Use data to call the second API (News API)
-            let news = await searchNews(item.name);
-
-            // Limit the number of articles per stock
-            let formattedNews = [];
-            if (news.status === 'ok') {
-                for (let j in news.articles) {
-                    if (j >= req.params.articleLimit) break;
-                    let source = news.articles[j].source.name;
-                    news.articles[j].source = source;
-                    news.articles[j].publishedAt = news.articles[j].publishedAt.split("T")[0];
-                    formattedNews.push(news.articles[j]);
-                }
-                item.news = formattedNews;
-            } else {
-                console.error("News API returned error");
-            }
-            
-            // Add stock data to return client
             resData.push(item);
         }
 
@@ -79,6 +56,39 @@ router.get('/list/:list/:listLimit/:articleLimit', (req, res) => {
     });
 });
 
+router.get('/news/:search/:articleLimit', (req, res) => {
+    const url = `${news.hostname}${news.path_search}?q=${req.params.search}&apiKey=${news.key}`;
+
+    axios.get(url).then(response => {
+        // Receive data from second API (News API)
+        const data = response.data;
+
+        // Limit the number of articles per stock
+        let formattedNews = [];
+        if (data.status === 'ok') {
+            for (let j in data.articles) {
+                if (j >= req.params.articleLimit) break;
+                // Tweak a few things
+                data.articles[j].source = data.articles[j].source.name;
+                data.articles[j].publishedAt = data.articles[j].publishedAt.split("T")[0];
+                formattedNews.push(data.articles[j]);
+            }
+
+        } else {
+            console.error("News API returned error");
+            console.error(data);
+        }
+
+        // Return data to client
+        res.end(JSON.stringify(formattedNews));
+
+    }).catch((error) => {
+        console.error(error);
+    });
+});
+
+
+// Use case 2
 router.get('/news_top/:country', (req, res) => {
     const url = `${news.hostname}${news.path_top}?country=${req.params.country}&category=business&apiKey=${news.key}`;
     axios.get(url).then((response) => {
@@ -87,17 +97,6 @@ router.get('/news_top/:country', (req, res) => {
         console.error(error);
     });
 });
-
-async function searchNews(search) {
-    console.log(search);
-    const url = `${news.hostname}${news.path_search}?q=${search}&apiKey=${news.key}`;
-    try {
-        const response = await axios.get(url);
-        return response.data;
-    } catch(error) {
-        console.error(error);
-    }
-}
 
 function getStock(stock) {
     const url = `${iex.hostname_test}${iex.path_stock}${stock}/company?token=${iex.key_test}`;
