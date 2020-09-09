@@ -15,62 +15,55 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active"><a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
-                <li class="nav-item"><a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a></li>
-            </ul>
+    <div class="header">
+        <div class="container margins">
+            <h1 class="display-3">Finance API Mashup</h1>
+            <p>Describe purpose and how to use it here</p>
         </div>
-    </nav>
+    </div>
 
-    <main role="main">
-        <div class="jumbotron">
-            <div class="container">
-                <h1 class="display-2">Finance API Mashup</h1>
-                <p>Descibe purpose and how to use it here</p>
+    <!-- User control section -->
+    <div class="container margins">
+        <div class="row">
+            <div class="col-md">
+                <h2>Trending stock news</h2>
+                <p>Please select options</p>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><label class="tableLabel">Collection:</label></td>
+                            <td><select name="collections" class="list" data-bind="options: collections, value: selectCollection"></select></td>
+                        </tr>
+                        <tr>
+                            <td><label class="tableLabel">Stock limit:</label></td>
+                            <td><select class="list" data-bind="options: limits, value: selectListLimit"></select></td>
+                        </tr>
+                        <tr>
+                            <td><label class="tableLabel addASpace">Article limit:</label></td>
+                            <td><select class="list" data-bind="options: limits, value: selectArticleLimit"></select></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <p><a class="btn btn-secondary" role="button" data-bind="click: getNews">Get latest news &raquo;</a></p>
+            </div>
+            <div class="col-md">
+                <h2>Use case 2</h2>
+                <p>Short description</p>
+                <p>User option one</p>
+                <p>User option two</p>
+                <p><a class="btn btn-secondary" role="button" data-bind="click: getStocks">Get trending stocks &raquo;</a></p>
             </div>
         </div>
-
-        <!-- User control section -->
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h2>Trending stock news</h2>
-                    <p>Please select which trend and the number of stocks to retrieve news for</p>
-                    <label for="collection">Collection:</label>
-                    <select name="collections" id="collections" class="list" data-bind="options: collections, value: selectCollection"></select>
-                    <br>
-                    <label for="listlimit" class="addASpace">List limit:</label>
-                    <select name="listlimit" id="listlimit" class="list" data-bind="options: limits, value: selectLimit"></select>
-                    <p><a class="btn btn-secondary" role="button" data-bind="click: getNews">Get latest news &raquo;</a></p>
-                </div>
-                <div class="col-md-6">
-                    <h2>Use case 2</h2>
-                    <p>Short description</p>
-                    <p>User option one</p>
-                    <p>User option two</p>
-                    <p><a class="btn btn-secondary" role="button" data-bind="click: getStocks">Get trending stocks &raquo;</a></p>
-                </div>
-            </div>
-            <hr>
-        </div>
-    </main>
+        <hr>
+    </div>
 
     <!-- Display results section -->
-    <div class="container">
+    <div class="container margins">
         <h2>Results</h2>
 
-        <!-- ko ifnot: showNews || showStocks -->
-            <p>Your results will display here</p>
-        <!-- /ko -->
-
+        <p data-bind="ifnot: showNews() || showStocks() || loading()">Your results will display here</p>
+        <p data-bind="if: loading">Loading...</p>
 
         <!-- ko if: showNews -->
             <p>Trending stock news</p>
@@ -78,33 +71,37 @@
             <div class="row-title">
                 <div class="col col-md-1">Stock</div>
                 <div class="col col-md-1"><span data-bind="text: selectCollection"></span></div>
-                <div class="col col-md-3">Image</div>
-                <div class="col col-md-4">Title</div>
+                <div class="col col-md-3">Cover</div>
+                <div class="col col-md-4">Article</div>
                 <div class="col col-md-2">Source</div>
                 <div class="col col-md-1">Date</div>
             </div>
 
             <div data-bind="foreach: newsList">
-                <div class="row">
-                    <div class="col col-md-1">
-                        <span data-bind="text: symbol"></span>
+                <!-- ko foreach: news -->
+                    <div class="row">
+                        <div class="col col-md-1">
+                            <span data-bind="text: $parent.name + ' (' + $parent.symbol + ')'"></span>
+                        </div>
+                        <div class="col col-md-1">
+                            <span data-bind="text: $parent.price"></span>
+                        </div>
+                        <div class="col col-md-3">
+                            <span><img data-bind="attr: { src: urlToImage, alt: 'Article cover image' }"></a></span>
+                        </div>
+                        <div class="col col-md-4">
+                            <span><a data-bind="text: title, attr: { href: url}" target="_blank"></a></span>
+                            <br>
+                            <span data-bind="text: description"></span>
+                        </div>
+                        <div class="col col-md-2">
+                            <span data-bind="text: source"></span>
+                        </div>
+                        <div class="col col-md-1">
+                            <span data-bind="text: publishedAt"></span>
+                        </div>
                     </div>
-                    <div class="col col-md-1">
-                        <span data-bind="text: amount"></span>
-                    </div>
-                    <div class="col col-md-3">
-                        <span><a data-bind=" attr: { href: link}" target="_blank"><img data-bind="attr: { src: image, alt: image }"></a></span>
-                    </div>
-                    <div class="col col-md-4">
-                        <span data-bind="text: title"></span>
-                    </div>
-                    <div class="col col-md-2">
-                        <span data-bind="text: source"></span>
-                    </div>
-                    <div class="col col-md-1">
-                        <span data-bind="text: date"></span>
-                    </div>
-                </div>
+                <!-- /ko -->
             </div>
         <!-- /ko -->
 

@@ -26,14 +26,14 @@ router.get("/", function(req, res){
     res.end("${hostname}${path}}${options}?token=${key}");
 });
 
-router.get('/list/:list/:limit', (req, res) => {
+router.get('/list/:list/:listLimit/:articleLimit', (req, res) => {
     const mapList = {Gains: "gainers", Losses: "losers", Active: "mostactive", Volume: "iexvolume", Percent: "iexpercent"};
-    const url = `${iex.hostname_test}${iex.path_list}${mapList[req.params.list]}?token=${iex.key_test}&listLimit=${req.params.limit}`;
+    const url = `${iex.hostname_test}${iex.path_list}${mapList[req.params.list]}?token=${iex.key_test}&listLimit=${req.params.listLimit}`;
 
     axios.get(url).then(async response => {
         // Receive data from first API (IEX Cloud)
         const data = response.data;
-        
+
         // Take desired data
         resData = [];
         for (let i in data) {
@@ -42,30 +42,36 @@ router.get('/list/:list/:limit', (req, res) => {
             item.name = data[i].companyName;
             item.exchange = data[i].primaryExchange;
             item.close = data[i].close;
+            item.price = data[i].latestPrice;
             item.time = data[i].latestTime;
             item.volume = data[i].volume;
             item.change = data[i].change;
             item.changePercent = data[i].changePercent;
 
             // Use data to call the second API (News API)
-            const news = await searchNews(item.name);
+            let news = await searchNews(item.name);
 
-            // Format response and send to client
+            // Limit the number of articles per stock
             let formattedNews = [];
             if (news.status === 'ok') {
                 for (let j in news.articles) {
-                    let article = [];
-                    // TODO FORMAT NEWS HERE
-                    formattedNews.push(article);
+                    if (j >= req.params.articleLimit) break;
+                    let source = news.articles[j].source.name;
+                    news.articles[j].source = source;
+                    news.articles[j].publishedAt = news.articles[j].publishedAt.split("T")[0];
+                    formattedNews.push(news.articles[j]);
                 }
-                item.news = news;
+                item.news = formattedNews;
             } else {
                 console.error("News API returned error");
             }
-
+            
+            // Add stock data to return client
             resData.push(item);
         }
-        console.log(JSON.stringify(resData));
+
+        // Return data to client
+        console.log(resData);
         res.end(JSON.stringify(resData));
 
     }).catch((error) => {
@@ -83,6 +89,7 @@ router.get('/news_top/:country', (req, res) => {
 });
 
 async function searchNews(search) {
+    console.log(search);
     const url = `${news.hostname}${news.path_search}?q=${search}&apiKey=${news.key}`;
     try {
         const response = await axios.get(url);
