@@ -47,16 +47,6 @@ router.get('/list/:list/:limit', (req, res) => {
     });
 });
 
-router.get('/stock/:stock', (req, res) => {
-    const url = `${iex.hostname_test}${iex.path_stock}${req.params.stock}/company?token=${iex.key_test}`;
-
-    axios.get(url).then((response) => {
-        res.end(JSON.stringify(response.data));
-    }).catch((error) => {
-        console.error(error);
-    });
-});
-
 router.get('/news_top/:country', (req, res) => {
     const url = `${news.hostname}${news.path_top}?country=${req.params.country}&category=business&apiKey=${news.key}`;
     
@@ -67,26 +57,25 @@ router.get('/news_top/:country', (req, res) => {
     });
 });
 
-function searchNews(search) {
-    const url = `{news.hostname}${news.path_top}?q=${req.params.search}&apiKey=${news.key}`
+
+function getStock(stock) {
+    const url = `${iex.hostname_test}${iex.path_stock}${stock}/company?token=${iex.key_test}`;
 
     axios.get(url).then((response) => {
         res.end(JSON.stringify(response.data));
     }).catch((error) => {
         console.error(error);
     });
-});
+};
 
-// Knockout example
-router.get("/expenses", function(req, res){
-    res.json(200, db);
-});
+function searchNews(search) {
+    const url = `{news.hostname}${news.path_top}?q=${search}&apiKey=${news.key}`
 
-router.post("/expenses", function(req, res){
-    console.log('req', req.body);
-    db.push(new Expense(req.body.desc, req.body.time));
-    res.json(200, db[db.length-1]);
-    res.end();
-});
+    axios.get(url).then((response) => {
+        res.end(JSON.stringify(response.data));
+    }).catch((error) => {
+        console.error(error);
+    });
+}
 
 module.exports = router;
