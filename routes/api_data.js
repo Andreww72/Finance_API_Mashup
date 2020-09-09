@@ -19,34 +19,36 @@ const news = {
     path_search: "/v2/everything"
 }
 
-let db = [];
-const Expense = function(name, time){
-  this.desc = name;
-  this.time = time;
-}
-db.push(new Expense('phone call', 0.2));
-db.push(new Expense('writing', 0.6));
-db.push(new Expense('reading', 0.9));
-
-
 router.use(logger('tiny'));
 
 router.get("/", function(req, res){
     res.end("${hostname}${path}}${options}?token=${key}");
 });
 
-router.get('/list/:list', (req, res) => {
-    const url = `${iex.hostname_test}${iex.path_list}${req.params.list}?token=${iex.key_test}`
+router.get('/list/:list/:limit', (req, res) => {
+    const url = `${iex.hostname_test}${iex.path_list}${req.params.list}?token=${iex.key_test}?listLimit=${req.params.limit}`;
 
     axios.get(url).then((response) => {
-        res.end(JSON.stringify(response.data));
+
+        // Receive data from first API (IEX Cloud)
+        const data = response.data;
+
+        // Use data to call the second API (News API)
+        searchNews = data.stocksArray;
+        resData = [];
+        for (let i in stocksArray) {
+            resData.push(searchNews(stocksArray[i]));
+        }
+
+        res.end(JSON.stringify(resData));
+
     }).catch((error) => {
         console.error(error);
     });
 });
 
 router.get('/stock/:stock', (req, res) => {
-    const url = `${iex.hostname_test}${iex.path_stock}${req.params.stock}/company?token=${iex.key_test}`
+    const url = `${iex.hostname_test}${iex.path_stock}${req.params.stock}/company?token=${iex.key_test}`;
 
     axios.get(url).then((response) => {
         res.end(JSON.stringify(response.data));
@@ -65,7 +67,7 @@ router.get('/news_top/:country', (req, res) => {
     });
 });
 
-router.get('/news_search/:search', (req, res) => {
+function searchNews(search) {
     const url = `{news.hostname}${news.path_top}?q=${req.params.search}&apiKey=${news.key}`
 
     axios.get(url).then((response) => {

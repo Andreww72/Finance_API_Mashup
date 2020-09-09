@@ -5,6 +5,14 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.list {
+  width: 150px;
+}
+
+.addASpace {
+  padding-right: 10px;
+}
+
 .row-title {
   height: 40px;
   padding-top: 10px;

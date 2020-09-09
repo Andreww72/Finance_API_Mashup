@@ -42,26 +42,13 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h2>Use case 1</h2>
-                    <p>Short description</p>
-
+                    <h2>Trending stock news</h2>
+                    <p>Please select which trend and the number of stocks to retrieve news for</p>
                     <label for="collection">Collection:</label>
-                    <select name="collection" id="collection">
-                        <option value="gains">Top gains</option>
-                        <option value="losses">Top losses</option>
-                        <option value="active">Most active</option>
-                        <option value="volume">Highest volume</option>
-                        <option value="percent">Highest percent</option>
-                    </select>
-                    
-                    </br>
-                    <label for="listlimit">List limit:</label>
-                    <select name="listlimit" id="listlimit">
-                        <!-- ko foreach: new Array(limitLength) -->
-                            <option data-bind="text: $index()+1, attr: { value: $index()+1 }"></option>
-                        <!-- /ko -->
-                    </select>
-
+                    <select name="collections" id="collections" class="list" data-bind="options: collctions, value: selectCollection"></select>
+                    <br>
+                    <label for="listlimit" class="addASpace">List limit:</label>
+                    <select name="listlimit" id="listlimit" class="list" data-bind="options: limits, value: selectLimit"></select>
                     <p><a class="btn btn-secondary" role="button" data-bind="click: getNews">Get latest news &raquo;</a></p>
                 </div>
                 <div class="col-md-6">
@@ -86,27 +73,35 @@
 
 
         <!-- ko if: showNews -->
-            <p>Showing news case</p>
+            <p>Trending stock news</p>
 
             <div class="row-title">
+                <div class="col col-md-1">Stock</div>
+                <div class="col col-md-1"><span data-bind="text: selectCollection"></span></div>
                 <div class="col col-md-3">Image</div>
-                <div class="col col-md-5">Title</div>
+                <div class="col col-md-4">Title</div>
                 <div class="col col-md-2">Source</div>
-                <div class="col col-md-2">Date</div>
+                <div class="col col-md-1">Date</div>
             </div>
 
             <div data-bind="foreach: newsList">
                 <div class="row">
+                    <div class="col col-md-1">
+                        <span data-bind="text: stock"></span>
+                    </div>
+                    <div class="col col-md-">
+                        <span data-bind="text: amount"></span>
+                    </div>
                     <div class="col col-md-3">
                         <span><a data-bind=" attr: { href: link}" target="_blank"><img data-bind="attr: { src: image, alt: image }"></a></span>
                     </div>
-                    <div class="col col-md-5">
+                    <div class="col col-md-4">
                         <span data-bind="text: title"></span>
                     </div>
                     <div class="col col-md-2">
                         <span data-bind="text: source"></span>
                     </div>
-                    <div class="col col-md-2">
+                    <div class="col col-md-1">
                         <span data-bind="text: date"></span>
                     </div>
                 </div>
@@ -114,7 +109,7 @@
         <!-- /ko -->
 
         <!-- ko if: showStocks -->
-            <p>Showing stocks case</p>
+            <p>Use case 2</p>
             <div class="row-title">
                 <div class="col-title">Article Title</div>
                 <div class="col-date">Date</div>
@@ -122,10 +117,10 @@
 
             <div data-bind="foreach: stocksList">
                 <div class="row" >
-                    <div class="col-title">
+                    <div class="col-title col-md-6">
                         <span data-bind="text: title"></span>
                     </div>
-                    <div class="col-date">
+                    <div class="col-date col-md-6">
                         <span data-bind="text: date"></span>
                     </div>
                 </div>
