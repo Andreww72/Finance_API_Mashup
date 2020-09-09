@@ -48,7 +48,21 @@ router.get('/list/:list/:limit', (req, res) => {
             item.changePercent = data[i].changePercent;
 
             // Use data to call the second API (News API)
-            item.news = await searchNews(item.name);
+            const news = await searchNews(item.name);
+
+            // Format response and send to client
+            let formattedNews = [];
+            if (news.status === 'ok') {
+                for (let j in news.articles) {
+                    let article = [];
+                    // TODO FORMAT NEWS HERE
+                    formattedNews.push(article);
+                }
+                item.news = news;
+            } else {
+                console.error("News API returned error");
+            }
+
             resData.push(item);
         }
         console.log(JSON.stringify(resData));

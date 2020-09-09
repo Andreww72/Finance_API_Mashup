@@ -12,7 +12,7 @@ const ViewModel = function() {
     // Mock data
     self.newsList = ko.observableArray([
         {
-            stock: "AAPL",
+            symbol: "AAPL",
             amount: "$100.01",
             image: "https://s.marketwatch.com/public/resources/images/MW-IN950_shangh_ZG_20200906232354.jpg",
             title: "SMIC slumps, SoftBank drops in mixed Asia markets",
@@ -20,7 +20,7 @@ const ViewModel = function() {
             date: "2020-09-07",
             link: "https://www.marketwatch.com/story/asian-markets-mixed-as-china-export-data-offsets-impact-of-wall-streets-retreat-2020-09-06"},
         {
-            stock: "GOOG",
+            symbol: "GOOG",
             amount: "$85.32",
             image: "https://image.cnbcfm.com/api/v1/image/106297479-1576462131957gettyimages-943704498.jpeg?v=1599438225",
             title: "China says August exports beat expectations, jumping 9.5% from a year ago",
@@ -29,7 +29,7 @@ const ViewModel = function() {
             link: "https://www.cnbc.com/2020/09/07/china-trade-exports-imports-in-august-2020.html"
         },
         {
-            stock: "TLSA",
+            symbol: "TLSA",
             amount: "$77.77",
             image: "https://static.foxnews.com/foxnews.com/content/uploads/2018/09/USSNimitzFeatured.jpg",
             title: "Search underway in Arabian Sea for missing US Navy sailor: report",
@@ -62,14 +62,7 @@ const ViewModel = function() {
             }
             response.json().then(data => {
                 // Receive server response and place in appropriate data variables
-                console.log(data);
-
-                for (let i in data) {
-
-                }
-
-                //self.newssList([{a: 1}, {b: 2}, {c: 3}]);
-                //self.stocksList([{a: 1}, {b: 2}, {c: 3}]);
+                self.newssList(data);
             });
         }).catch(error => {
             console.log('Fetch Error :-S', error);
