@@ -2,7 +2,7 @@
 const ViewModel = function() {
     const self = this;
     self.limitLength = 5;
-    self.collctions = ['Gains', 'Losses', 'Active', 'Volume', 'Percent'];
+    self.collections = ['Gains', 'Losses', 'Active', 'Volume', 'Percent'];
     self.selectCollection = "";
     self.limits = [1, 2, 3, 4 ,5];
     self.selectLimit = "";
@@ -53,7 +53,7 @@ const ViewModel = function() {
         // User input already passed through bindings
         const collection = self.selectCollection;
         const limit = self.selectLimit;
-
+        
         // Call server route
         fetch(`/api/list/${collection}/${limit}`).then(response => {
             if (response.status !== 200) {
@@ -63,6 +63,11 @@ const ViewModel = function() {
             response.json().then(data => {
                 // Receive server response and place in appropriate data variables
                 console.log(data);
+
+                for (let i in data) {
+
+                }
+
                 //self.newssList([{a: 1}, {b: 2}, {c: 3}]);
                 //self.stocksList([{a: 1}, {b: 2}, {c: 3}]);
             });

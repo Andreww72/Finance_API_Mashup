@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const logger = require('morgan');
+const { response } = require('express');
 const router = express.Router();
 
 const iex = {
@@ -26,20 +27,31 @@ router.get("/", function(req, res){
 });
 
 router.get('/list/:list/:limit', (req, res) => {
-    const url = `${iex.hostname_test}${iex.path_list}${req.params.list}?token=${iex.key_test}?listLimit=${req.params.limit}`;
+    const mapList = {Gains: "gainers", Losses: "losers", Active: "mostactive", Volume: "iexvolume", Percent: "iexpercent"};
+    const url = `${iex.hostname_test}${iex.path_list}${mapList[req.params.list]}?token=${iex.key_test}&listLimit=${req.params.limit}`;
 
-    axios.get(url).then((response) => {
-
+    axios.get(url).then(async response => {
         // Receive data from first API (IEX Cloud)
         const data = response.data;
-
-        // Use data to call the second API (News API)
-        searchNews = data.stocksArray;
+        
+        // Take desired data
         resData = [];
-        for (let i in stocksArray) {
-            resData.push(searchNews(stocksArray[i]));
-        }
+        for (let i in data) {
+            item = {};
+            item.symbol = data[i].symbol;
+            item.name = data[i].companyName;
+            item.exchange = data[i].primaryExchange;
+            item.close = data[i].close;
+            item.time = data[i].latestTime;
+            item.volume = data[i].volume;
+            item.change = data[i].change;
+            item.changePercent = data[i].changePercent;
 
+            // Use data to call the second API (News API)
+            item.news = await searchNews(item.name);
+            resData.push(item);
+        }
+        console.log(JSON.stringify(resData));
         res.end(JSON.stringify(resData));
 
     }).catch((error) => {
@@ -49,7 +61,6 @@ router.get('/list/:list/:limit', (req, res) => {
 
 router.get('/news_top/:country', (req, res) => {
     const url = `${news.hostname}${news.path_top}?country=${req.params.country}&category=business&apiKey=${news.key}`;
-    
     axios.get(url).then((response) => {
         res.end(JSON.stringify(response.data));
     }).catch((error) => {
@@ -57,25 +68,23 @@ router.get('/news_top/:country', (req, res) => {
     });
 });
 
+async function searchNews(search) {
+    const url = `${news.hostname}${news.path_search}?q=${search}&apiKey=${news.key}`;
+    try {
+        const response = await axios.get(url);
+        return response.data;
+    } catch(error) {
+        console.error(error);
+    }
+}
 
 function getStock(stock) {
     const url = `${iex.hostname_test}${iex.path_stock}${stock}/company?token=${iex.key_test}`;
-
     axios.get(url).then((response) => {
         res.end(JSON.stringify(response.data));
     }).catch((error) => {
         console.error(error);
     });
 };
-
-function searchNews(search) {
-    const url = `{news.hostname}${news.path_top}?q=${search}&apiKey=${news.key}`
-
-    axios.get(url).then((response) => {
-        res.end(JSON.stringify(response.data));
-    }).catch((error) => {
-        console.error(error);
-    });
-}
 
 module.exports = router;
