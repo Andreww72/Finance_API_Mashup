@@ -20,7 +20,7 @@ const ViewModel = function() {
     self.newsList = ko.observableArray([]);
 
     // Use case 2 bindings
-    self.countries = ['US', 'AU', 'CA', 'CH', 'DE', 'FR', 'GB', 'HK', 'JP', 'NZ'];
+    self.countries = ['US', 'AU', 'CA', 'CH', 'FR', 'GB', 'HK', 'JP', 'NZ'];
     self.currencies = ['USD', 'AUD', 'CAD', 'EUR', 'GBP', 'HKD', 'JPY', 'NZD'];
     self.selectCountry = "";
     self.selectCurrency = "";
@@ -124,9 +124,8 @@ const ViewModel = function() {
         fetch(`/api/parse/${self.selectCountry.toLowerCase()}`).then(response => {
             response.json().then(data => {
                 // Receive server response
-                console.log(data);
                 self.parsedList(data);
-
+                console.log(self.parsedList());
                 // Allow client to display
                 self.loading(false);
                 self.showParsed(true);

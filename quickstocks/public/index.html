@@ -19,6 +19,14 @@
         <div class="container">
             <h1 class="display-3">Quick Stocks API Mashup</h1>
             <p>Describe purpose and how to use it here</p>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><label class="tableLabel">Currency:</label></td>
+                        <td><select class="list" data-bind="options: currencies, value: selectCurrency"></select></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -45,7 +53,7 @@
                     </tbody>
                 </table>
                 <br>
-                <p><a class="btn btn-primary" role="button" data-bind="click: getTopStocks">Get trending stocks &raquo;</a></p>
+                <button class="btn btn-primary" role="button" data-bind="click: getTopStocks, disable: loading">Get trending stocks &raquo;</button>
             </div>
             <div class="col-md">
                 <h2>News trends</h2>
@@ -56,18 +64,10 @@
                             <td><label class="tableLabel">Country:</label></td>
                             <td><select class="list" data-bind="options: countries, value: selectCountry"></select></td>
                         </tr>
-                        <tr>
-                            <td><label class="tableLabel">Currency:</label></td>
-                            <td><select class="list" data-bind="options: currencies, value: selectCurrency"></select></td>
-                        </tr>
-                        <tr>
-                            <td><label class="tableLabel">Another:</label></td>
-                            <td><select class="list" data-bind="options: currencies, value: selectCurrency"></select></td>
-                        </tr>
                     </tbody>
                 </table>
-                <br>
-                <p><a class="btn btn-primary" role="button" data-bind="click: parseNews">Get trending stocks &raquo;</a></p>
+                <br><br><br><br><br>
+                <button class="btn btn-primary" role="button" data-bind="click: parseNews, disable: loading">Get trending news &raquo;</button>
             </div>
         </div>
         <hr>
@@ -107,47 +107,12 @@
                         <td data-bind="text: changePercent"></td>
                         <td data-bind="text: volume"></td>
                         <td data-bind="text: time"></td>
-                        <td><a class="btn btn-secondary" role="button" data-bind="click: $parent.getStockNews">Get news &raquo;</a></td>
+                        <td><button class="btn btn-secondary" role="button" data-bind="click: $parent.getStockNews">Get news &raquo;</button></td>
                     </tr>
                 </tbody>
             </table>
             <p><a class="btn btn-secondary" role="button" data-bind="click: clearNews">Clear news &raquo;</a></p>
         <!-- /ko -->
-
-        <!-- Modal -->
-        <div class="modal fade" id="stockInfoModal" tabindex="-1" role="dialog" aria-labelledby="stockInfoModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                    <!-- ko ifnot: modalLoading -->
-                        <h5 class="modal-title" id="stockInfoModalLabel" data-bind="text: modalContent().Name + '(' + modalContent().Symbol + ')'"></h5>
-                    <!-- /ko -->
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    </div>
-                    <div class="modal-body">
-                        <p data-bind="if: modalLoading">Loading...</p>
-                        <!-- ko ifnot: modalLoading -->
-                            <p data-bind="text: modalContent().Description"></p>
-                            <ul class="list-group">
-                                <li class="list-group-item" data-bind="text: 'Industry: ' + modalContent().industry"></li>
-                                <li class="list-group-item" data-bind="text: 'Country: ' + modalContent().country"></li>
-                                <li class="list-group-item" data-bind="text: 'Currency: ' + modalContent().currency"></li>
-                                <li class="list-group-item" data-bind="text: 'Beta: ' + modalContent().beta"></li>
-                                <li class="list-group-item" data-bind="text: 'Book value: ' + modalContent().bookValue"></li>
-                                <li class="list-group-item" data-bind="text: 'EBITDA: ' + modalContent().EBITDA"></li>
-                                <li class="list-group-item" data-bind="text: 'Earnings per share: ' + modalContent().EPS"></li>
-                                <li class="list-group-item" data-bind="text: 'Dividend yield: ' + modalContent().dividendYield"></li>
-                            </ul>
-                        <!-- /ko -->
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- ko if: showNews -->
             <h4>Trending News</h4>
@@ -179,8 +144,72 @@
 
         <!-- Use case 2 -->
         <!-- ko if: showParsed -->
-            <p>Use case 2 stuff</p>
+            <h4>Trending News</h4>
+
+            <table class="table">
+                <thead>
+                    <tr class="row-title">
+                        <td>Company</td>
+                        <td>Cover</td>
+                        <td>Article</td>
+                        <td>Source</td>
+                        <td>Date</td>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: parsedList">
+                    <tr>
+                        <td>
+                            <!-- ko foreach: symbolMatches -->
+                                <a data-bind="text: symbol, click: $parents[1].getStockInfo" href="#" data-toggle="modal" data-target="#stockInfoModal"></a>
+                                <br>
+                            <!-- /ko -->
+                        </td>
+                        <td><img class="articleImg" data-bind="attr: { src: urlToImage, alt: 'Article cover image' }"></td>
+                        <td>
+                            <a data-bind="text: title, attr: { href: url}" target="_blank"></a>
+                            <span data-bind="text: description"></span>
+                        </td>
+                        <td data-bind="text: source"></td>
+                        <td data-bind="text: publishedAt"></td>
+                    </tr>
+                </tbody>
+            </table>            
         <!-- /ko -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="stockInfoModal" tabindex="-1" role="dialog" aria-labelledby="stockInfoModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <!-- ko ifnot: modalLoading -->
+                        <h5 class="modal-title" id="stockInfoModalLabel" data-bind="text: modalContent().name + ' (' + modalContent().symbol + ')'"></h5>
+                    <!-- /ko -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        <p data-bind="if: modalLoading">Loading...</p>
+                        <!-- ko ifnot: modalLoading -->
+                            <p data-bind="text: modalContent().description"></p>
+                            <ul class="list-group">
+                                <li class="list-group-item" data-bind="text: 'Industry: ' + modalContent().industry"></li>
+                                <li class="list-group-item" data-bind="text: 'Country: ' + modalContent().country"></li>
+                                <li class="list-group-item" data-bind="text: 'Currency: ' + modalContent().currency"></li>
+                                <li class="list-group-item" data-bind="text: 'Beta: ' + modalContent().beta"></li>
+                                <li class="list-group-item" data-bind="text: 'Book value: ' + modalContent().bookValue"></li>
+                                <li class="list-group-item" data-bind="text: 'EBITDA: ' + modalContent().EBITDA"></li>
+                                <li class="list-group-item" data-bind="text: 'Earnings per share: ' + modalContent().EPS"></li>
+                                <li class="list-group-item" data-bind="text: 'Dividend yield: ' + modalContent().dividendYield"></li>
+                            </ul>
+                        <!-- /ko -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <p data-bind="if: loading">Loading...</p>
     </div>

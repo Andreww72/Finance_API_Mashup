@@ -39,7 +39,7 @@ let exRates = {USD: 1};
 let currency = "USD";
 getExRates();
 
-// Use case 1
+
 router.get('/list/:list/:listLimit', (req, res) => {
     const mapList = {Gains: "gainers", Losses: "losers", Active: "mostactive", Volume: "iexvolume", Percent: "iexpercent"};
     const url = `${iex.hostname_test}${iex.path_list}${mapList[req.params.list]}?token=${iex.key_test}&listLimit=${req.params.listLimit}`;
@@ -78,7 +78,11 @@ router.get('/stock/:symbol', (req, res) => {
     axios.get(url).then(response => {
         // Receive data from AA API
         const data = response.data;
+
         const resData = {
+            symbol: data.Symbol,
+            name: data.Name,
+            description: data.Description,
             industry: data.Industry,
             country: data.Country,
             currency: data.Currency,
@@ -128,8 +132,6 @@ router.get('/news/:search/:articleLimit', (req, res) => {
     });
 });
 
-
-// Use case 2
 router.get('/parse/:country', (req, res) => {
     const url = `${news.hostname}${news.path_top}?country=${req.params.country}&category=business&apiKey=${news.key}`;
     axios.get(url).then(async response => {
@@ -143,6 +145,7 @@ router.get('/parse/:country', (req, res) => {
             // Parse news for company names
             for (let i in articles) {
                 // Parse article
+                articles[i].source = articles[i].source.name;
                 const title = articles[i].title;
                 const words = title.split(" ");
                 let articleMatches = [];
@@ -179,25 +182,14 @@ router.get('/parse/:country', (req, res) => {
                 let symbolMatches = [];
                 for (let j in articleMatches) {
                     let symbol = await getCompanySymbol(articleMatches[j]);
-                    if (symbol && !symbol.includes(".")) symbolMatches.push(symbol);
+                    if (symbol && !symbol.includes(".")) symbolMatches.push({"symbol": symbol});
                 }
                 articles[i].symbolMatches = symbolMatches;
+
+                // Only return articles that had a match (with the match + stock info)
                 if (symbolMatches.length > 0) {
                     resArticles.push(articles[i]);
                 }
-                console.log(symbolMatches);
-
-                // Get company data with symbols
-                // for (let i in symbolMatches) {
-                //     const stockUrl = `${aa.hostname}${aa.path}function=OVERVIEW&symbol=${req.params.symbol}&apikey=${aa.key}`;
-                //     axios.get(stockUrl).then(response => {
-                //         // Receive data AA API
-                //         articles[i].stockData = response.data;
-
-                //     }).catch(error => {
-                //         console.error(error);
-                //     });
-                // }
             }
         }
         res.end(JSON.stringify(resArticles));
@@ -206,7 +198,6 @@ router.get('/parse/:country', (req, res) => {
         console.error(error);
     });
 });
-
 
 router.get('/ex/:currency', (req, res) => {
     exRates = req.params.currency;
