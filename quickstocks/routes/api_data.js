@@ -55,8 +55,8 @@ router.get('/list/:list/:listLimit', (req, res) => {
             item.symbol = data[i].symbol;
             item.name = data[i].companyName;
             item.exchange = data[i].primaryExchange;
-            item.close = data[i].close;
-            item.price = data[i].latestPrice;
+            item.close = data[i].close / exRates[currency];
+            item.price = data[i].latestPrice / exRates[currency];
             item.time = data[i].latestTime;
             item.volume = data[i].volume;
             item.change = data[i].change;
@@ -78,9 +78,19 @@ router.get('/stock/:symbol', (req, res) => {
     axios.get(url).then(response => {
         // Receive data from AA API
         const data = response.data;
+        const resData = {
+            industry: data.Industry,
+            country: data.Country,
+            currency: data.Currency,
+            beta: data.Beta,
+            bookValue: data.BookValue,
+            EBITDA: data.EBITDA / exRates[currency],
+            EPS: data.EPS / exRates[currency],
+            dividendYield: data.DividendYield
+        }
 
         // Return data to client
-        res.end(JSON.stringify(data));
+        res.end(JSON.stringify(resData));
 
     }).catch(error => {
         console.error(error);
@@ -127,13 +137,14 @@ router.get('/parse/:country', (req, res) => {
         // Receive data from News API
         const data = response.data;
         let articles = data.articles;
+        let resArticles = [];
         if (data.status === 'ok') {
 
             // Parse news for company names
             for (let i in articles) {
                 // Parse article
-                let title = articles[i].title;
-                let words = title.split(" ");
+                const title = articles[i].title;
+                const words = title.split(" ");
                 let articleMatches = [];
                 
                 // Find words that contain a capital letter
@@ -170,14 +181,18 @@ router.get('/parse/:country', (req, res) => {
                     let symbol = await getCompanySymbol(articleMatches[j]);
                     if (symbol && !symbol.includes(".")) symbolMatches.push(symbol);
                 }
-                articles.symbolMatches = symbolMatches;
+                articles[i].symbolMatches = symbolMatches;
+                if (symbolMatches.length > 0) {
+                    resArticles.push(articles[i]);
+                }
+                console.log(symbolMatches);
 
                 // Get company data with symbols
                 // for (let i in symbolMatches) {
                 //     const stockUrl = `${aa.hostname}${aa.path}function=OVERVIEW&symbol=${req.params.symbol}&apikey=${aa.key}`;
                 //     axios.get(stockUrl).then(response => {
                 //         // Receive data AA API
-                //         articles.stockData = response.data;
+                //         articles[i].stockData = response.data;
 
                 //     }).catch(error => {
                 //         console.error(error);
@@ -185,7 +200,7 @@ router.get('/parse/:country', (req, res) => {
                 // }
             }
         }
-        res.end(JSON.stringify(articles));
+        res.end(JSON.stringify(resArticles));
         
     }).catch(error => {
         console.error(error);
