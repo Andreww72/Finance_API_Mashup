@@ -14,6 +14,12 @@ const iex = {
     path_stock: "/stable/stock/"
 }
 
+const aa = {
+    key: "5Q0WBK9ZWBF6MGKK",
+    hostname: "https://www.alphavantage.co",
+    path: "/query?"
+}
+
 const news = {
     key: "f7bf34ce452b45749f2cb86581c09506",
     hostname: "https://newsapi.org",
@@ -48,8 +54,22 @@ router.get('/list/:list/:listLimit', (req, res) => {
         }
 
         // Return data to client
-        console.log(resData);
         res.end(JSON.stringify(resData));
+
+    }).catch((error) => {
+        console.error(error);
+    });
+});
+
+router.get('/stock/:symbol', (req, res) => {
+    const url = `${aa.hostname}${aa.path}function=OVERVIEW&symbol=${req.params.symbol}&apikey=${aa.key}`;
+    console.log(url);
+    axios.get(url).then(response => {
+        // Receive data from second API (News API)
+        const data = response.data;
+        console.log(data);
+        // Return data to client
+        res.end(JSON.stringify(data));
 
     }).catch((error) => {
         console.error(error);
@@ -60,7 +80,7 @@ router.get('/news/:search/:articleLimit', (req, res) => {
     const url = `${news.hostname}${news.path_search}?q=${req.params.search}&apiKey=${news.key}`;
 
     axios.get(url).then(response => {
-        // Receive data from second API (News API)
+        // Receive data from News API
         const data = response.data;
 
         // Limit the number of articles per stock

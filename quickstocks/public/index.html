@@ -45,14 +45,14 @@
                     </tbody>
                 </table>
                 <br>
-                <p><a class="btn btn-secondary" role="button" data-bind="click: getTopStocks">Get trending stocks &raquo;</a></p>
+                <p><a class="btn btn-primary" role="button" data-bind="click: getTopStocks">Get trending stocks &raquo;</a></p>
             </div>
             <div class="col-md">
                 <h2>Use case 2</h2>
                 <p>Short description</p>
                 <p>User option one</p>
                 <p>User option two</p>
-                <p><a class="btn btn-secondary" role="button" data-bind="click: getCase2">Get trending stocks &raquo;</a></p>
+                <p><a class="btn btn-primary" role="button" data-bind="click: getCase2">Get trending stocks &raquo;</a></p>
             </div>
         </div>
         <hr>
@@ -85,7 +85,7 @@
                 <tbody data-bind="foreach: stocksList">
                     <tr>
                         <td data-bind="text: symbol"></td>
-                        <td data-bind="text: name"></td>
+                        <td><a data-bind="text: name, click: $parent.getStockInfo" href="#" data-toggle="modal" data-target="#stockInfoModal"></a></td>
                         <td data-bind="text: exchange"></td>
                         <td data-bind="text: price"></td>
                         <td data-bind="text: change"></td>
@@ -98,6 +98,41 @@
             </table>
             <p><a class="btn btn-secondary" role="button" data-bind="click: clearNews">Clear news &raquo;</a></p>
         <!-- /ko -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="stockInfoModal" tabindex="-1" role="dialog" aria-labelledby="stockInfoModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <!-- ko ifnot: modalLoading -->
+                        <h5 class="modal-title" id="stockInfoModalLabel" data-bind="text: modalContent().Name + '(' + modalContent().Symbol + ')'"></h5>
+                    <!-- /ko -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        <p data-bind="if: modalLoading">Loading...</p>
+                        <!-- ko ifnot: modalLoading -->
+                            <p data-bind="text: modalContent().Description"></p>
+                            <ul class="list-group">
+                                <li class="list-group-item" data-bind="text: 'Industry: ' + modalContent().Industry"></li>
+                                <li class="list-group-item" data-bind="text: 'Country: ' + modalContent().Country"></li>
+                                <li class="list-group-item" data-bind="text: 'Currency: ' + modalContent().Currency"></li>
+                                <li class="list-group-item" data-bind="text: 'Beta: ' + modalContent().Beta"></li>
+                                <li class="list-group-item" data-bind="text: 'Book value: ' + modalContent().BookValue"></li>
+                                <li class="list-group-item" data-bind="text: 'EBITDA: ' + modalContent().EBITDA"></li>
+                                <li class="list-group-item" data-bind="text: 'Earnings per share: ' + modalContent().EPS"></li>
+                                <li class="list-group-item" data-bind="text: 'Dividend yield: ' + modalContent().DividendYield"></li>
+                            </ul>
+                        <!-- /ko -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- ko if: showNews -->
             <h4>Trending News</h4>

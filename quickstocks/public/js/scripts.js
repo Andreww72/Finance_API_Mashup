@@ -10,6 +10,8 @@ const ViewModel = function() {
     self.selectStockLimit = "";
     self.selectArticleLimit = "";
     self.loading = ko.observable(false);
+    self.modalLoading = ko.observable(false);
+    self.modalContent = ko.observable("");
     self.showStocks = ko.observable(false);
     self.showNews = ko.observable(false);
     self.stocksList = ko.observableArray([]);
@@ -56,6 +58,23 @@ const ViewModel = function() {
         });
     };
 
+    self.getStockInfo = function(stock) {
+        self.modalLoading(true);
+
+        // Call server route
+        console.log('called')
+        fetch(`/api/stock/${stock.symbol}`).then(response => {
+            response.json().then(data => {
+                console.log(data);
+                self.modalContent(data);
+                self.modalLoading(false);
+            });
+        }).catch(error => {
+            console.log('Fetch Error :-S', error);
+        });
+
+    };
+
     self.getStockNews = function(stock) {
         self.loading(true);
 
@@ -72,7 +91,7 @@ const ViewModel = function() {
                     data[i].name = stock.name;
                     self.newsList.push(data[i]);
                 }
-                console.log(self.newsList());
+
                 // Display what server returns
                 self.loading(false);
                 self.showNews(true);
