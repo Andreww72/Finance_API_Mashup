@@ -6,9 +6,10 @@ FROM ubuntu
 MAINTAINER Andrew Mather
 
 # Install basic applications
-RUN apt-get -y update && apt-get install -y \
-	git \
-	curl
+RUN apt-get update
+RUN apt-get -y install curl gnupg
+RUN curl -sL https://deb.nodesource.com/setup_12.x  | bash -
+RUN apt-get -y install nodejs
 
 # Copy the application folder inside the container
 ADD /quickstocks /quickstocks
@@ -21,4 +22,7 @@ WORKDIR /quickstocks
 
 # Setup web server
 RUN npm install
-RUN npm start
+
+# Start web server when container run
+CMD npm start
+
