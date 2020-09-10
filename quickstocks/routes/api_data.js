@@ -32,11 +32,12 @@ const news = {
 const exrate = {
     key: "fc450af0dbc897fc46550f76",
     hostname: "https://v6.exchangerate-api.com",
-    path: "/v6?"
+    path: "/v6"
 }
 
-let useExRate = false;
-
+let exRates = {USD: 1};
+let currency = "USD";
+getExRates();
 
 // Use case 1
 router.get('/list/:list/:listLimit', (req, res) => {
@@ -66,7 +67,7 @@ router.get('/list/:list/:listLimit', (req, res) => {
         // Return data to client
         res.end(JSON.stringify(resData));
 
-    }).catch((error) => {
+    }).catch(error => {
         console.error(error);
     });
 });
@@ -81,7 +82,7 @@ router.get('/stock/:symbol', (req, res) => {
         // Return data to client
         res.end(JSON.stringify(data));
 
-    }).catch((error) => {
+    }).catch(error => {
         console.error(error);
     });
 });
@@ -112,7 +113,7 @@ router.get('/news/:search/:articleLimit', (req, res) => {
         // Return data to client
         res.end(JSON.stringify(formattedNews));
 
-    }).catch((error) => {
+    }).catch(error => {
         console.error(error);
     });
 });
@@ -178,7 +179,7 @@ router.get('/parse/:country', (req, res) => {
                 //         // Receive data AA API
                 //         articles.stockData = response.data;
 
-                //     }).catch((error) => {
+                //     }).catch(error => {
                 //         console.error(error);
                 //     });
                 // }
@@ -186,11 +187,30 @@ router.get('/parse/:country', (req, res) => {
         }
         res.end(JSON.stringify(articles));
         
-    }).catch((error) => {
+    }).catch(error => {
         console.error(error);
     });
 });
 
+
+router.get('/ex/:currency', (req, res) => {
+    exRates = req.params.currency;
+    res.end();
+});
+
+function getExRates() {
+    const url = `${exrate.hostname}${exrate.path}/${exrate.key}/latest/USD`;
+
+    axios.get(url).then(response => {
+        // Receive data from ExchangeRate-API
+        const data = response.data;
+        if (response.data.result === "success") {
+            exRates = response.data.conversion_rates;
+        }
+    }).catch(error => {
+        console.error(error);
+    });
+}
 
 async function getCompanySymbol(name) {
     const url = `http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=${name}&region=1&lang=en&callback=YAHOO.Finance.SymbolSuggest.ssCallback`
