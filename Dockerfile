@@ -12,13 +12,13 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x  | bash -
 RUN apt-get -y install nodejs
 
 # Copy the application folder inside the container
-ADD /quickstocks /quickstocks
+ADD /easymoney /easymoney
 
 # Expose ports
 EXPOSE 80
 
 # Set default CMD directory
-WORKDIR /quickstocks
+WORKDIR /easymoney
 
 # Setup web server
 RUN npm install

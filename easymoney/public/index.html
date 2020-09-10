@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Finance API Mashup">
     <meta name="author" content="Andrew Mather">
-    <title>Quick Stocks</title>
+    <title>Easy Money</title>
 
     <!-- CSS -->
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon"/>
@@ -17,7 +17,7 @@
 <body>
     <div class="jumbotron">
         <div class="container">
-            <h1 class="display-3">Quick Stocks API Mashup</h1>
+            <h1 class="display-3">Easy Money API Mashup</h1>
             <p>Describe purpose and how to use it here</p>
             <table>
                 <tbody>
@@ -57,6 +57,20 @@
             </div>
             <div class="col-md">
                 <h2>News trends</h2>
+                <p>Please select options</p>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><label class="tableLabel">Country:</label></td>
+                            <td><select class="list" data-bind="options: countries, value: selectCountry"></select></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br><br><br><br><br>
+                <button class="btn btn-primary" role="button" data-bind="click: parseNews, disable: loading">Get trending news &raquo;</button>
+            </div>
+            <div class="col-md">
+                <h2>Crypto trends</h2>
                 <p>Please select options</p>
                 <table>
                     <tbody>
