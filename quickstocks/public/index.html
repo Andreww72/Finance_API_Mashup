@@ -26,13 +26,13 @@
     <div class="container">
         <div class="row">
             <div class="col-md">
-                <h2>Trending stock news</h2>
+                <h2>Market trends</h2>
                 <p>Please select options</p>
                 <table>
                     <tbody>
                         <tr>
                             <td><label class="tableLabel">Collection:</label></td>
-                            <td><select name="collections" class="list" data-bind="options: collections, value: selectCollection"></select></td>
+                            <td><select class="list" data-bind="options: collections, value: selectCollection"></select></td>
                         </tr>
                         <tr>
                             <td><label class="tableLabel">Stock limit:</label></td>
@@ -48,11 +48,26 @@
                 <p><a class="btn btn-primary" role="button" data-bind="click: getTopStocks">Get trending stocks &raquo;</a></p>
             </div>
             <div class="col-md">
-                <h2>Use case 2</h2>
-                <p>Short description</p>
-                <p>User option one</p>
-                <p>User option two</p>
-                <p><a class="btn btn-primary" role="button" data-bind="click: getCase2">Get trending stocks &raquo;</a></p>
+                <h2>News trends</h2>
+                <p>Please select options</p>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><label class="tableLabel">Country:</label></td>
+                            <td><select class="list" data-bind="options: countries, value: selectCountry"></select></td>
+                        </tr>
+                        <tr>
+                            <td><label class="tableLabel">Currency:</label></td>
+                            <td><select class="list" data-bind="options: currencies, value: selectCurrency"></select></td>
+                        </tr>
+                        <tr>
+                            <td><label class="tableLabel">Another:</label></td>
+                            <td><select class="list" data-bind="options: currencies, value: selectCurrency"></select></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <p><a class="btn btn-primary" role="button" data-bind="click: parseNews">Get trending stocks &raquo;</a></p>
             </div>
         </div>
         <hr>
@@ -62,7 +77,7 @@
     <div class="container">
         <h3>Results</h3>
 
-        <p data-bind="ifnot: showStocks() || showCase2() || loading()">Your results will display here</p>
+        <p data-bind="ifnot: showStocks() || showParsed() || loading()">Your results will display here</p>
         
         <!-- Use case 1 -->
         <!-- ko if: showStocks -->
@@ -163,7 +178,7 @@
         <!-- /ko -->
 
         <!-- Use case 2 -->
-        <!-- ko if: showCase2 -->
+        <!-- ko if: showParsed -->
             <p>Use case 2 stuff</p>
         <!-- /ko -->
 

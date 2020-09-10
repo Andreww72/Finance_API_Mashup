@@ -1,7 +1,9 @@
 const express = require('express');
 const axios = require('axios');
 const logger = require('morgan');
+const { findWord } = require('most-common-words-by-language');
 const { response } = require('express');
+
 const router = express.Router();
 router.use(logger('tiny'));
 
@@ -27,13 +29,21 @@ const news = {
     path_search: "/v2/everything"
 }
 
+const exrate = {
+    key: "fc450af0dbc897fc46550f76",
+    hostname: "https://v6.exchangerate-api.com",
+    path: "/v6?"
+}
+
+let useExRate = false;
+
 
 // Use case 1
 router.get('/list/:list/:listLimit', (req, res) => {
     const mapList = {Gains: "gainers", Losses: "losers", Active: "mostactive", Volume: "iexvolume", Percent: "iexpercent"};
     const url = `${iex.hostname_test}${iex.path_list}${mapList[req.params.list]}?token=${iex.key_test}&listLimit=${req.params.listLimit}`;
 
-    axios.get(url).then(async response => {
+    axios.get(url).then(response => {
         // Receive data from first API (IEX Cloud)
         const data = response.data;
 
@@ -63,11 +73,11 @@ router.get('/list/:list/:listLimit', (req, res) => {
 
 router.get('/stock/:symbol', (req, res) => {
     const url = `${aa.hostname}${aa.path}function=OVERVIEW&symbol=${req.params.symbol}&apikey=${aa.key}`;
-    console.log(url);
+
     axios.get(url).then(response => {
-        // Receive data from second API (News API)
+        // Receive data from AA API
         const data = response.data;
-        console.log(data);
+
         // Return data to client
         res.end(JSON.stringify(data));
 
@@ -109,22 +119,93 @@ router.get('/news/:search/:articleLimit', (req, res) => {
 
 
 // Use case 2
-router.get('/news_top/:country', (req, res) => {
+router.get('/parse/:country', (req, res) => {
     const url = `${news.hostname}${news.path_top}?country=${req.params.country}&category=business&apiKey=${news.key}`;
-    axios.get(url).then((response) => {
-        res.end(JSON.stringify(response.data));
+    axios.get(url).then(async response => {
+
+        // Receive data from News API
+        const data = response.data;
+        let articles = data.articles;
+        if (data.status === 'ok') {
+
+            // Parse news for company names
+            for (let i in articles) {
+                // Parse article
+                let title = articles[i].title;
+                let words = title.split(" ");
+                let articleMatches = [];
+                
+                // Find words that contain a capital letter
+                for (let j in words) {
+                    let word = words[j];
+                    let firstLetter = word[0];
+                    
+                    // Remove words with punctuation, real words, extra short
+                    if (word.length < 2 || !firstLetter.match(/[a-z]/i) ||
+                        word.includes("'") || word.includes("$") ||
+                        word.includes("(") || word.includes(")") ||
+                        word.includes("?") || word.includes("!") ||
+                        word.includes(".") || word.includes(",") ||
+                        word.includes("'") || word.includes('"') ||
+                        word.includes("/") || word.includes('’') ||
+                        word.includes(":") || word.includes("%")) {
+                        continue;
+                    }
+                    if (findWord(word).hasOwnProperty('english')) continue;
+
+                    // Find remaining words that contain a capital letter
+                    for (let k in word) {
+                        const letter = word[0];
+
+                        if (letter == letter.toUpperCase()) {
+                            articleMatches.push(word);
+                            break;
+                        }
+                    }
+                }
+                // Convert company names to symbols
+                let symbolMatches = [];
+                for (let j in articleMatches) {
+                    let symbol = await getCompanySymbol(articleMatches[j]);
+                    if (symbol && !symbol.includes(".")) symbolMatches.push(symbol);
+                }
+                articles.symbolMatches = symbolMatches;
+
+                // Get company data with symbols
+                // for (let i in symbolMatches) {
+                //     const stockUrl = `${aa.hostname}${aa.path}function=OVERVIEW&symbol=${req.params.symbol}&apikey=${aa.key}`;
+                //     axios.get(stockUrl).then(response => {
+                //         // Receive data AA API
+                //         articles.stockData = response.data;
+
+                //     }).catch((error) => {
+                //         console.error(error);
+                //     });
+                // }
+            }
+        }
+        res.end(JSON.stringify(articles));
+        
     }).catch((error) => {
         console.error(error);
     });
 });
 
-function getStock(stock) {
-    const url = `${iex.hostname_test}${iex.path_stock}${stock}/company?token=${iex.key_test}`;
-    axios.get(url).then((response) => {
-        res.end(JSON.stringify(response.data));
-    }).catch((error) => {
+
+async function getCompanySymbol(name) {
+    const url = `http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=${name}&region=1&lang=en&callback=YAHOO.Finance.SymbolSuggest.ssCallback`
+    try {
+        const response = await axios.get(url);
+        let data = response.data;
+        data = data.split("YAHOO.Finance.SymbolSuggest.ssCallback(")[1];
+        data = data.substring(0, data.length - 2);
+        data = JSON.parse(data);
+        if (data.ResultSet.Result.length === 0) return null;
+        else return data.ResultSet.Result[0].symbol;
+
+    } catch(error) {
         console.error(error);
-    });
-};
+    }
+}
 
 module.exports = router;

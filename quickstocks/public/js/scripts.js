@@ -2,24 +2,31 @@
 const ViewModel = function() {
     const self = this;
 
+    // General bindings
+    self.loading = ko.observable(false);
+    self.modalLoading = ko.observable(false);
+    self.modalContent = ko.observable("");
+
     // Use case 1 bindings
-    self.limitLength = 5;
     self.collections = ['Gains', 'Losses', 'Active', 'Volume', 'Percent'];
     self.limits = [1, 2, 3, 4 ,5];
     self.selectCollection = "";
     self.selectStockLimit = "";
     self.selectArticleLimit = "";
-    self.loading = ko.observable(false);
-    self.modalLoading = ko.observable(false);
-    self.modalContent = ko.observable("");
+
     self.showStocks = ko.observable(false);
     self.showNews = ko.observable(false);
     self.stocksList = ko.observableArray([]);
     self.newsList = ko.observableArray([]);
 
     // Use case 2 bindings
-    self.showCase2 = ko.observable(false);
-    self.case2List = ko.observableArray([
+    self.countries = ['US', 'AU', 'EU', 'GB'];
+    self.currencies = ['USD', 'AUD', 'EUR', 'GBP'];
+    self.selectCountry = "";
+    self.selectCurrency = "";
+
+    self.showParsed = ko.observable(false);
+    self.parsedList = ko.observableArray([
         {title: 'Stock listing A', date: "05/09/2020"},
         {title: 'Stock listing B', date: "06/09/2020"},
         {title: 'Stock listing C', date: "07/09/2020"}
@@ -30,11 +37,10 @@ const ViewModel = function() {
         // Ensure correct state
         self.stocksList([]);
         self.newsList([]);
-        self.case2List([]);
         self.loading(true);
         self.showStocks(false);
         self.showNews(false);
-        self.showCase2(false);
+        self.showParsed(false);
 
         // User input already passed through bindings
         // Call server route
@@ -44,14 +50,12 @@ const ViewModel = function() {
                 return;
             }
             response.json().then(data => {
-                // Receive server response and place in data bound variable
+                // Receive server response
                 self.stocksList(data);
 
-                // Display what server returns
+                // Allow client to display
                 self.loading(false);
                 self.showStocks(true);
-                self.showNews(false);
-                self.showCase2(false);
             });
         }).catch(error => {
             console.log('Fetch Error :-S', error);
@@ -62,17 +66,17 @@ const ViewModel = function() {
         self.modalLoading(true);
 
         // Call server route
-        console.log('called')
         fetch(`/api/stock/${stock.symbol}`).then(response => {
             response.json().then(data => {
-                console.log(data);
+                // Receive server response
                 self.modalContent(data);
+
+                // Allow client to display
                 self.modalLoading(false);
             });
         }).catch(error => {
             console.log('Fetch Error :-S', error);
         });
-
     };
 
     self.getStockNews = function(stock) {
@@ -86,13 +90,13 @@ const ViewModel = function() {
                 return;
             }
             response.json().then(data => {
-                // Receive server response and place in data bound variable
+                // Receive server response
                 for (let i in data) {
                     data[i].name = stock.name;
                     self.newsList.push(data[i]);
                 }
 
-                // Display what server returns
+                // Allow client to display
                 self.loading(false);
                 self.showNews(true);
             });
@@ -105,22 +109,32 @@ const ViewModel = function() {
         self.newsList([]);
     }
 
+
     // Use case 2
-    self.getCase2 = function() {
-        self.stocksList([]);
-        self.newsList([]);
+    self.parseNews = function() {
+        // Ensure correct state
+        self.parsedList([]);
         self.loading(true);
         self.showStocks(false);
         self.showNews(false);
-        self.showCase2(false);
+        self.showParsed(false);
         
-        // Get user input
-
+        // User input already passed through bindings
         // Call server route
+        fetch(`/api/parse/${self.selectCountry}`).then(response => {
+            response.json().then(data => {
+                // Receive server response
+                console.log(data);
+                self.parsedList(data);
 
-        // Display what server returns
-        self.loading(false);
-        self.showCase2(true);
+                // Allow client to display
+                self.loading(false);
+                self.showParsed(true);
+            });
+        }).catch(error => {
+            console.log('Fetch Error :-S', error);
+        });
+
     };
 };
 
