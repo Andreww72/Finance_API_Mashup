@@ -1,37 +1,17 @@
 const express = require('express');
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
 const logger = require('morgan');
+const axios = require('axios');
+const api = require('../api_data');
 
 const router = express.Router();
 router.use(logger('tiny'));
 
-const iexCloud = {
-    key_prod: "pk_01dff3cecba84f319d83cd2f8176b098",
-    key_test: "Tpk_94a72a7825f5411784cc74f20d9dab38",
-    hostname_prod: "https://cloud.iexapis.com",
-    hostname_test: "https://sandbox.iexapis.com",
-    path_list: "/stable/stock/market/list/",
-}
-
-const alphaAdv = {
-    key: "5Q0WBK9ZWBF6MGKK",
-    hostname: "https://www.alphavantage.co",
-    path: "/query?"
-}
-
-const newsApi = {
-    key: "f7bf34ce452b45749f2cb86581c09506",
-    hostname: "https://newsapi.org",
-    path_top: "/v2/top-headlines",
-    path_search: "/v2/everything"
-}
-
 
 router.get('/list/:list/:listLimit', (req, res) => {
     const mapList = {Gains: "gainers", Losses: "losers", Active: "mostactive", Volume: "iexvolume", Percent: "iexpercent"};
-    const url = `${iexCloud.hostname_test}${iexCloud.path_list}${mapList[req.params.list]}?token=${iexCloud.key_test}&listLimit=${req.params.listLimit}`;
+    const listLimit = req.params.listLimit;
+    const listType = mapList[req.params.list]
+    const url = `${api.iexCloud.hostname_test}${api.iexCloud.path_list}${listType}?token=${api.iexCloud.key_test}&listLimit=${listLimit}`;
 
     axios.get(url).then(response => {
         // Receive data from first API (IEX Cloud)
@@ -64,7 +44,8 @@ router.get('/list/:list/:listLimit', (req, res) => {
 });
 
 router.get('/symbol/:symbol', (req, res) => {
-    const url = `${alphaAdv.hostname}${alphaAdv.path}function=OVERVIEW&symbol=${req.params.symbol}&apikey=${alphaAdv.key}`;
+    const symbol = req.params.symbol;
+    const url = `${api.alphaAdv.hostname}${api.alphaAdv.path}function=OVERVIEW&symbol=${symbol}&apikey=${api.alphaAdv.key}`;
 
     axios.get(url).then(response => {
         // Receive data from AA API
@@ -95,7 +76,8 @@ router.get('/symbol/:symbol', (req, res) => {
 });
 
 router.get('/news/:search/:articleLimit', (req, res) => {
-    const url = `${newsApi.hostname}${newsApi.path_search}?q=${req.params.search}&apiKey=${newsApi.key}`;
+    const search = req.params.search;
+    const url = `${api.newsApi.hostname}${api.newsApi.path_search}?q=${search}&apiKey=${api.newsApi.key}`;
 
     axios.get(url).then(response => {
         // Receive data from News API

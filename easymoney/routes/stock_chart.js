@@ -1,19 +1,12 @@
 const express = require('express');
+const logger = require('morgan');
 const axios = require('axios');
 const fs = require('fs');
-const path = require('path');
-const logger = require('morgan');
+const api = require('../api_data');
 
 const router = express.Router();
 router.use(logger('tiny'));
 
-const alphaAdv = {
-    key: "5Q0WBK9ZWBF6MGKK",
-    hostname: "https://www.alphavantage.co",
-    path: "/query?"
-}
-
-const chartIo = "https://quickchart.io/chart";
 
 router.get('/:symbol/:frequency/:timeRange/:dataType', (req, res) => {
     const symbol = req.params.symbol.toUpperCase();
@@ -21,7 +14,7 @@ router.get('/:symbol/:frequency/:timeRange/:dataType', (req, res) => {
     const timeRange = req.params.timeRange;
     const dataType = req.params.dataType;
     const mapTypes = {Open: '1. open', High: '2. high', Low: '3. low', Close: '4. close', Volume: '5. volume'}
-    const url = `${alphaAdv.hostname}${alphaAdv.path}function=TIME_SERIES_${frequency.toUpperCase()}&symbol=${symbol}&apikey=${alphaAdv.key}`;
+    const url = `${api.alphaAdv.hostname}${api.alphaAdv.path}function=TIME_SERIES_${frequency.toUpperCase()}&symbol=${symbol}&apikey=${api.alphaAdv.key}`;
 
     axios.get(url).then(response => {
         // Receive data from AA API

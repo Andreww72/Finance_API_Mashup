@@ -1,32 +1,17 @@
 const express = require('express');
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
 const logger = require('morgan');
-const { findWord } = require('most-common-words-by-language');
-//const { response } = require('express');
+const axios = require('axios');
+const api = require('../api_data');
+const findWord = require('most-common-words-by-language');
 
 const router = express.Router();
 router.use(logger('tiny'));
-
-const alphaAdv = {
-    key: "5Q0WBK9ZWBF6MGKK",
-    hostname: "https://www.alphavantage.co",
-    path: "/query?"
-}
-
-const newsApi = {
-    key: "f7bf34ce452b45749f2cb86581c09506",
-    hostname: "https://newsapi.org",
-    path_top: "/v2/top-headlines",
-    path_search: "/v2/everything"
-}
 
 
 router.get('/:country/:category', (req, res) => {
     const country = req.params.country.toLowerCase();
     const category = req.params.category.toLowerCase();
-    const url = `${newsApi.hostname}${newsApi.path_top}?country=${country}&category=${category}&apiKey=${newsApi.key}`;
+    const url = `${api.newsApi.hostname}${api.newsApi.path_top}?country=${country}&category=${category}&apiKey=${api.newsApi.key}`;
 
     axios.get(url).then(async response => {
         // Receive data from News API
@@ -95,7 +80,7 @@ router.get('/:country/:category', (req, res) => {
 });
 
 async function getCompanySymbol(name) {
-    const url = `http://d.yimg.com/autoc.finance.yahoo.com/autoc?query=${name}&region=1&lang=en&callback=YAHOO.Finance.SymbolSuggest.ssCallback`
+    const url = `${api.yahooFin.hostname}${api.yahooFin.path}?query=${name}&region=1&lang=en&callback=YAHOO.Finance.SymbolSuggest.ssCallback`
     try {
         const response = await axios.get(url);
         let data = response.data;
