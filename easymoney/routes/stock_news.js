@@ -1,0 +1,130 @@
+const express = require('express');
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const logger = require('morgan');
+
+const router = express.Router();
+router.use(logger('tiny'));
+
+const iexCloud = {
+    key_prod: "pk_01dff3cecba84f319d83cd2f8176b098",
+    key_test: "Tpk_94a72a7825f5411784cc74f20d9dab38",
+    hostname_prod: "https://cloud.iexapis.com",
+    hostname_test: "https://sandbox.iexapis.com",
+    path_list: "/stable/stock/market/list/",
+}
+
+const alphaAdv = {
+    key: "5Q0WBK9ZWBF6MGKK",
+    hostname: "https://www.alphavantage.co",
+    path: "/query?"
+}
+
+const newsApi = {
+    key: "f7bf34ce452b45749f2cb86581c09506",
+    hostname: "https://newsapi.org",
+    path_top: "/v2/top-headlines",
+    path_search: "/v2/everything"
+}
+
+
+router.get('/list/:list/:listLimit', (req, res) => {
+    const mapList = {Gains: "gainers", Losses: "losers", Active: "mostactive", Volume: "iexvolume", Percent: "iexpercent"};
+    const url = `${iexCloud.hostname_test}${iexCloud.path_list}${mapList[req.params.list]}?token=${iexCloud.key_test}&listLimit=${req.params.listLimit}`;
+
+    axios.get(url).then(response => {
+        // Receive data from first API (IEX Cloud)
+        const data = response.data;
+
+        // Add stock data to return client
+        resData = [];
+        for (let i in data) {
+            item = {};
+            item.symbol = data[i].symbol;
+            item.name = data[i].companyName;
+            item.exchange = data[i].primaryExchange;
+            item.close = data[i].close;
+            item.price = data[i].latestPrice;
+            item.time = data[i].latestTime;
+            item.volume = data[i].volume;
+            item.change = data[i].change;
+            item.changePercent = data[i].changePercent;
+            resData.push(item);
+        }
+
+        // Return data to client
+        res.statusCode = 200; 
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(resData));
+
+    }).catch(error => {
+        console.error(error);
+    });
+});
+
+router.get('/symbol/:symbol', (req, res) => {
+    const url = `${alphaAdv.hostname}${alphaAdv.path}function=OVERVIEW&symbol=${req.params.symbol}&apikey=${alphaAdv.key}`;
+
+    axios.get(url).then(response => {
+        // Receive data from AA API
+        const data = response.data;
+
+        const resData = {
+            symbol: data.Symbol,
+            name: data.Name,
+            description: data.Description,
+            industry: data.Industry,
+            country: data.Country,
+            currency: data.Currency,
+            beta: data.Beta,
+            bookValue: data.BookValue,
+            EBITDA: data.EBITDA,
+            EPS: data.EPS,
+            dividendYield: data.DividendYield
+        }
+
+        // Return data to client
+        res.statusCode = 200; 
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(resData));
+
+    }).catch(error => {
+        console.error(error);
+    });
+});
+
+router.get('/news/:search/:articleLimit', (req, res) => {
+    const url = `${newsApi.hostname}${newsApi.path_search}?q=${req.params.search}&apiKey=${newsApi.key}`;
+
+    axios.get(url).then(response => {
+        // Receive data from News API
+        const data = response.data;
+
+        // Limit the number of articles per stock
+        let formattedNews = [];
+        if (data.status === 'ok') {
+            for (let j in data.articles) {
+                if (j >= req.params.articleLimit) break;
+                // Tweak a few things
+                data.articles[j].source = data.articles[j].source.name;
+                data.articles[j].publishedAt = data.articles[j].publishedAt.split("T")[0];
+                formattedNews.push(data.articles[j]);
+            }
+
+        } else {
+            console.error("News API returned error");
+            console.error(data);
+        }
+
+        // Return data to client
+        res.statusCode = 200; 
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(formattedNews));
+
+    }).catch(error => {
+        console.error(error);
+    });
+});
+
+module.exports = router;

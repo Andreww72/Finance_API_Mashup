@@ -13,20 +13,10 @@ const ViewModel = function() {
     self.selectCollection = "";
     self.selectStockLimit = "";
     self.selectArticleLimit = "";
-
     self.showStocks = ko.observable(false);
     self.showNews = ko.observable(false);
     self.stocksList = ko.observableArray([]);
     self.newsList = ko.observableArray([]);
-
-    // Use case 2 bindings
-    self.countries = ['US', 'AU', 'CA', 'CH', 'FR', 'GB', 'HK', 'JP', 'NZ'];
-    self.currencies = ['USD', 'AUD', 'CAD', 'EUR', 'GBP', 'HKD', 'JPY', 'NZD'];
-    self.selectCountry = "";
-    self.selectCurrency = "";
-
-    self.showParsed = ko.observable(false);
-    self.parsedList = ko.observableArray([]);
 
     // Use case 3 bindings
     self.frequencies = ['Daily', 'Weekly', 'Monthly'];
@@ -38,6 +28,14 @@ const ViewModel = function() {
     self.selectTimeRange = "Past Year";
     self.showCharts = ko.observable(false);
     self.chartLink = ko.observable("");
+
+    // Parse News bindings
+    self.countries = ['US', 'AU', 'CA', 'CH', 'FR', 'GB', 'HK', 'JP', 'NZ'];
+    self.selectCountry = "";
+    self.categories = ['Business', 'Entertainment', 'General', 'Health', 'Science', 'Sports', 'Technology'];
+    self.selectCategory = "Business";
+    self.showParsed = ko.observable(false);
+    self.parsedList = ko.observableArray([]);
 
 
     // Clickables
@@ -53,7 +51,7 @@ const ViewModel = function() {
 
         // User input already passed through bindings
         // Call server route
-        fetch(`/api/list/${self.selectCollection}/${self.selectStockLimit}`).then(response => {
+        fetch(`/api/stock/list/${self.selectCollection}/${self.selectStockLimit}`).then(response => {
             if (response.status !== 200) {
                 console.log('Issue encountered. Status Code: ' + response.status);
                 return;
@@ -75,7 +73,7 @@ const ViewModel = function() {
         self.modalLoading(true);
 
         // Call server route
-        fetch(`/api/stock/${stock.symbol}`).then(response => {
+        fetch(`/api/stock/symbol/${stock.symbol}`).then(response => {
             response.json().then(data => {
                 // Receive server response
                 self.modalContent(data);
@@ -93,7 +91,7 @@ const ViewModel = function() {
 
         // User input already passed through bindings
         // Call server route
-        fetch(`/api/news/${stock.name}/${self.selectArticleLimit}`).then(response => {
+        fetch(`/api/stock/news/${stock.name}/${self.selectArticleLimit}`).then(response => {
             if (response.status !== 200) {
                 console.log('Issue encountered. Status Code: ' + response.status);
                 return;
@@ -116,6 +114,7 @@ const ViewModel = function() {
 
     self.clearNews = function() {
         self.newsList([]);
+        self.showNews(false);
     }
 
 
@@ -131,7 +130,7 @@ const ViewModel = function() {
         
         // User input already passed through bindings
         // Call server route
-        fetch(`/api/parse/${self.selectCountry.toLowerCase()}`).then(response => {
+        fetch(`/api/parse/${self.selectCountry.toLowerCase()}/${self.selectCategory.toLowerCase()}`).then(response => {
             response.json().then(data => {
                 // Receive server response
                 self.parsedList(data);
@@ -159,7 +158,7 @@ const ViewModel = function() {
         // TODO input validation here
 
         // Call server route
-        fetch(`/api/chart/${self.inputSymbol}/${self.selectFrequency}/${self.selectDataType}`).then(response => {
+        fetch(`/api/chart/${self.inputSymbol}/${self.selectFrequency}/${self.selectTimeRange}/${self.selectDataType}`).then(response => {
             // Receive server response
             response.json().then(data => {
                 self.chartLink(data.chart);

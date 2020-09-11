@@ -19,14 +19,6 @@
         <div class="container">
             <h1 class="display-3">Easy Money API Mashup</h1>
             <p>Describe purpose and how to use it here</p>
-            <table>
-                <tbody>
-                    <tr>
-                        <td><label class="tableLabel">Currency:</label></td>
-                        <td><select class="list" data-bind="options: currencies, value: selectCurrency"></select></td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </div>
 
@@ -34,43 +26,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md">
-                <h2>Market trends</h2>
-                <p>Please select options</p>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td><label class="tableLabel">Collection:</label></td>
-                            <td><select class="list" data-bind="options: collections, value: selectCollection"></select></td>
-                        </tr>
-                        <tr>
-                            <td><label class="tableLabel">Stock limit:</label></td>
-                            <td><select class="list" data-bind="options: limits, value: selectStockLimit"></select></td>
-                        </tr>
-                        <tr>
-                            <td><label class="tableLabel addASpace">Article limit:</label></td>
-                            <td><select class="list" data-bind="options: limits, value: selectArticleLimit"></select></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <br>
-                <button class="btn btn-primary" role="button" data-bind="click: getTopStocks, disable: loading">Get trending stocks &raquo;</button>
-            </div>
-            <div class="col-md">
-                <h2>News trends</h2>
-                <p>Please select options</p>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td><label class="tableLabel">Country:</label></td>
-                            <td><select class="list" data-bind="options: countries, value: selectCountry"></select></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <br><br><br><br>
-                <button class="btn btn-primary" role="button" data-bind="click: parseNews, disable: loading">Get trending news &raquo;</button>
-            </div>
-            <div class="col-md">
-                <h2>Chart performance</h2>
+                <h2>Chart Stock</h2>
                 <p>Please select options</p>
                 <table>
                     <tbody>
@@ -93,7 +49,47 @@
                     </tbody>
                 </table>
                 <br>
-                <button class="btn btn-primary" role="button" data-bind="click: chartStocks, disable: loading">Get stock chart &raquo;</button>
+                <button class="btn btn-primary" data-bind="click: chartStocks, disable: loading">Get stock chart &raquo;</button>
+            </div>
+            <div class="col-md">
+                <h2>Market Trends</h2>
+                <p>Please select options</p>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><label class="tableLabel">Collection:</label></td>
+                            <td><select class="list" data-bind="options: collections, value: selectCollection"></select></td>
+                        </tr>
+                        <tr>
+                            <td><label class="tableLabel">Stock limit:</label></td>
+                            <td><select class="list" data-bind="options: limits, value: selectStockLimit"></select></td>
+                        </tr>
+                        <tr>
+                            <td><label class="tableLabel addASpace">Article limit:</label></td>
+                            <td><select class="list" data-bind="options: limits, value: selectArticleLimit"></select></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <button class="btn btn-primary" data-bind="click: getTopStocks, disable: loading">Get trending stocks &raquo;</button>
+            </div>
+            <div class="col-md">
+                <h2>Parse News</h2>
+                <p>Please select options</p>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><label class="tableLabel">Country:</label></td>
+                            <td><select class="list" data-bind="options: countries, value: selectCountry"></select></td>
+                        </tr>
+                        <tr>
+                            <td><label class="tableLabel">Country:</label></td>
+                            <td><select class="list" data-bind="options: categories, value: selectCategory"></select></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br><br><br><br>
+                <button class="btn btn-primary" data-bind="click: parseNews, disable: loading">Get trending news &raquo;</button>
             </div>
         </div>
         <hr>
@@ -103,9 +99,15 @@
     <div class="container">
         <h3>Results</h3>
 
-        <p data-bind="ifnot: showStocks() || showParsed() || loading()">Your results will display here</p>
+        <p data-bind="ifnot: showCharts() || showStocks() || showParsed() || loading()">Your results will display here</p>
         
-        <!-- Use case 1 -->
+        <!-- Chart stock use case -->
+        <!-- ko if: showCharts -->
+            <h4>Stock Chart</h4>
+            <img class="chart" data-bind="attr: { src: chartLink, alt: 'Stock Performance Chart'} ">
+        <!-- /ko -->
+
+        <!-- Market trends use case -->
         <!-- ko if: showStocks -->
             <h4 data-bind="text: 'Trending Stocks ' + selectCollection"></h4>
 
@@ -120,7 +122,7 @@
                         <td>Change %</td>
                         <td>Volume</td>
                         <td>Date</td>
-                        <td>Button</td>
+                        <td></td>
                     </tr>
                 </thead>
                 <tbody data-bind="foreach: stocksList">
@@ -133,15 +135,15 @@
                         <td data-bind="text: changePercent"></td>
                         <td data-bind="text: volume"></td>
                         <td data-bind="text: time"></td>
-                        <td><button class="btn btn-secondary" role="button" data-bind="click: $parent.getStockNews">Get news &raquo;</button></td>
+                        <td><button class="btn btn-secondary" data-bind="click: $parent.getStockNews, disable: $parent.loading">Get news &raquo;</button></td>
                     </tr>
                 </tbody>
             </table>
-            <p><a class="btn btn-secondary" role="button" data-bind="click: clearNews">Clear news &raquo;</a></p>
         <!-- /ko -->
 
         <!-- ko if: showNews -->
             <h4>Trending News</h4>
+            <p><a class="btn btn-warning" data-bind="click: clearNews, disable: loading">Clear news &raquo;</a></p>
 
             <table class="table">
                 <thead>
@@ -168,7 +170,7 @@
             </table>
         <!-- /ko -->
 
-        <!-- Use case 2 -->
+        <!-- Parse news use case -->
         <!-- ko if: showParsed -->
             <h4>Trending News</h4>
 
@@ -202,13 +204,7 @@
             </table>            
         <!-- /ko -->
 
-        <!-- Use case 3 -->
-        <!-- ko if: showCharts -->
-            <h4>Stock Chart</h4>
-            <img class="chart" data-bind="attr: { src: chartLink, alt: 'Stock Performance Chart'} ">
-        <!-- /ko -->
-
-        <!-- Modal -->
+        <!-- Stock information modal -->
         <div class="modal fade" id="stockInfoModal" tabindex="-1" role="dialog" aria-labelledby="stockInfoModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
