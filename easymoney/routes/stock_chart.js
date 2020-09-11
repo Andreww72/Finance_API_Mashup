@@ -18,13 +18,12 @@ router.get("/:symbol/:frequency/:dataType", (req, res) => {
 
     // Call Alpha Advantage API for stock data
     axios.get(url).then(response => {
-
         // Receive data, 
         const data = response.data;
 
         // If no data return to client and inform of no data
         if (data.hasOwnProperty('Error Message')) {
-            console.log('No chart data available');
+            console.error('No chart data available');
             res.statusCode = 200;
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify({error: "No data for request"}));

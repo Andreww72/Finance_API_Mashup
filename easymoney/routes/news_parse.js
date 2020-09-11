@@ -33,7 +33,6 @@ router.get('/:country/:category', (req, res) => {
                 // Find words that contain a capital letter
                 for (let j in words) {
                     let word = words[j];
-                    let firstLetter = word[0];
 
                     // Remove words with punctuation, real words, extra short
                     if (removeWord(word)) continue;
@@ -74,6 +73,8 @@ router.get('/:country/:category', (req, res) => {
 // Check if a word shouldn't be considered as a possible company name
 // Excluded if includes unusual punctuation, too short, not alphabetical, a common English word.
 function removeWord(word) {
+    let firstLetter = word[0];
+    
     if (word.length < 2 || !firstLetter.match(/[a-z]/i)) return true;
     if (word.includes("'") || word.includes("$") ||
     word.includes("(") || word.includes(")") ||

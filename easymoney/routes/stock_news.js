@@ -19,26 +19,34 @@ router.get("/list/:list/:listLimit", (req, res) => {
     axios.get(url).then(response => {
         // Receive data and take desired properties
         const data = response.data;
-        resData = [];
 
-        for (let i in data) {
-            item = {};
-            item.symbol = data[i].symbol;
-            item.name = data[i].companyName;
-            item.exchange = data[i].primaryExchange;
-            item.close = data[i].close;
-            item.price = data[i].latestPrice;
-            item.time = data[i].latestTime;
-            item.volume = data[i].volume;
-            item.change = data[i].change;
-            item.changePercent = data[i].changePercent;
-            resData.push(item);
+        // Check for a result
+        if (data === {}) {
+            res.statusCode = 200; 
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({error: "Not a symbol"}));
+
+        } else {
+            resData = [];
+            for (let i in data) {
+                item = {};
+                item.symbol = data[i].symbol;
+                item.name = data[i].companyName;
+                item.exchange = data[i].primaryExchange;
+                item.close = data[i].close;
+                item.price = data[i].latestPrice;
+                item.time = data[i].latestTime;
+                item.volume = data[i].volume;
+                item.change = data[i].change;
+                item.changePercent = data[i].changePercent * 100;
+                resData.push(item);
+            }
+
+            // Return data to client
+            res.statusCode = 200; 
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify(resData));
         }
-
-        // Return data to client
-        res.statusCode = 200; 
-        res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify(resData));
 
     }).catch(error => {
         console.error(error);
@@ -94,28 +102,37 @@ router.get("/symbol/:symbol", (req, res) => {
 
     // Call Alpha Advantage API for stock data
     axios.get(url).then(response => {
-        // Receive data and take desired properties
+        // Receive data
         const data = response.data;
 
-        const resData = {
-            symbol: data.Symbol,
-            name: data.Name,
-            description: data.Description,
-            industry: data.Industry,
-            country: data.Country,
-            currency: data.Currency,
-            beta: data.Beta,
-            bookValue: data.BookValue,
-            EBITDA: data.EBITDA,
-            EPS: data.EPS,
-            dividendYield: data.DividendYield
+        // If no data return to client and inform of no data
+        if (Object.getOwnPropertyNames(data).length == 0) {
+            console.error("No stock data for symbol");
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({error: "No data for symbol"}));
+
+        } else {
+            // Take desired properties
+            const resData = {
+                symbol: data.Symbol,
+                name: data.Name,
+                description: data.Description,
+                industry: data.Industry,
+                country: data.Country,
+                currency: data.Currency,
+                beta: data.Beta,
+                bookValue: data.BookValue,
+                EBITDA: data.EBITDA,
+                EPS: data.EPS,
+                dividendYield: data.DividendYield
+            }
+
+            // Return data to client
+            res.statusCode = 200; 
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify(resData));
         }
-
-        // Return data to client
-        res.statusCode = 200; 
-        res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify(resData));
-
     }).catch(error => {
         console.error(error);
         res.statusCode = 500;

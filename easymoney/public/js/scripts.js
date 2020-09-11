@@ -7,6 +7,7 @@ const ViewModel = function() {
     self.error = ko.observable(false);
     self.modalLoading = ko.observable(false);
     self.modalContent = ko.observable("");
+    self.modalError = ko.observable(false);
 
     // Chart stock bindings
     self.frequencies = ["Daily", "Weekly", "Monthly"];
@@ -31,7 +32,7 @@ const ViewModel = function() {
     // Parse news bindings
     self.countries = ["US", "AU", "CA", "CH", "FR", "GB", "HK", "JP", "NZ"];
     self.selectCountry = "";
-    self.categories = ["Business", "Entertainment", "General", "Health", "Science", "Sports", "Technology"];
+    self.categories = ["Business", "Entertainment", "General", "Health", "Science", "Technology"];
     self.selectCategory = "Business";
     self.showParsed = ko.observable(false);
     self.parsedList = ko.observableArray([]);
@@ -183,7 +184,8 @@ const ViewModel = function() {
     // Multi use case
     self.getStockInfo = function(stock) {
         self.modalLoading(true);
-        
+        self.modalError(false);
+
         // Handle two possibilities here
         let symbol = "";
         if (stock.hasOwnProperty("symbol")) symbol = stock.symbol;
@@ -193,7 +195,12 @@ const ViewModel = function() {
         fetch(`/api/stock/symbol/${symbol}`).then(response => {
             response.json().then(data => {
                 // Receive server response
-                self.modalContent(data);
+                if (data.hasOwnProperty('error')) {
+                    self.modalError(true);
+                    self.modalContent({error: data.error});
+                } else {
+                    self.modalContent(data);
+                }
 
                 // Allow client to display
                 self.modalLoading(false);
