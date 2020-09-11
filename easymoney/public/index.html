@@ -8,39 +8,38 @@
     <meta name="author" content="Andrew Mather">
     <title>Easy Money</title>
 
-    <!-- CSS -->
+    <!-- Styling -->
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon"/>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
 </head>
 
 <body>
+    <!-- Heading -->
     <div class="jumbotron">
         <div class="container">
             <h1 class="display-3">Easy Money API Mashup</h1>
-            <p>Describe purpose and how to use it here</p>
         </div>
     </div>
 
-    <!-- User control section -->
+    <!-- User options and controls -->
     <div class="container">
         <div class="row">
+
+            <!-- Chart stock use case options -->
             <div class="col-md">
                 <h2>Chart Stock</h2>
-                <p>Please select options</p>
+                <p>Displays stock time series chart.</p>
+                <p>Select a stock and charting options:</p>
                 <table>
                     <tbody>
                         <tr>
                             <td><label class="tableLabel">Symbol:</label></td>
-                            <td><input class="list" data-bind="value: inputSymbol"></select></td>
+                            <td><input class="list" data-bind="value: inputSymbol" placeholder="AAPL"></select></td>
                         </tr>
                         <tr>
                             <td><label class="tableLabel">Frequency:</label></td>
                             <td><select class="list" data-bind="options: frequencies, value: selectFrequency"></select></td>
-                        </tr>
-                        <tr>
-                            <td><label class="tableLabel">Time range:</label></td>
-                            <td><select class="list" data-bind="options: timeRange, value: selectTimeRange"></select></td>
                         </tr>
                         <tr>
                             <td><label class="tableLabel">Data type:</label></td>
@@ -51,9 +50,12 @@
                 <br>
                 <button class="btn btn-primary" data-bind="click: chartStocks, disable: loading">Get stock chart &raquo;</button>
             </div>
+
+            <!-- Market trend use case options -->
             <div class="col-md">
                 <h2>Market Trends</h2>
-                <p>Please select options</p>
+                <p>Finds trending stocks and related news.</p>
+                <p>Select a trend type and amount:</p>
                 <table>
                     <tbody>
                         <tr>
@@ -73,9 +75,12 @@
                 <br>
                 <button class="btn btn-primary" data-bind="click: getTopStocks, disable: loading">Get trending stocks &raquo;</button>
             </div>
+
+            <!-- Parse news use case options -->
             <div class="col-md">
                 <h2>Parse News</h2>
-                <p>Please select options</p>
+                <p>Parse new headlines for company mentions.</p>
+                <p>Select a country and category:</p>
                 <table>
                     <tbody>
                         <tr>
@@ -88,7 +93,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <br><br><br><br>
+                <br><br>
                 <button class="btn btn-primary" data-bind="click: parseNews, disable: loading">Get trending news &raquo;</button>
             </div>
         </div>
@@ -101,13 +106,16 @@
 
         <p data-bind="ifnot: showCharts() || showStocks() || showParsed() || loading()">Your results will display here</p>
         
-        <!-- Chart stock use case -->
+        <!-- Chart stock use case results -->
         <!-- ko if: showCharts -->
-            <h4>Stock Chart</h4>
+            <h4>
+                Stock Chart for 
+                <a data-bind="text: inputSymbol, click: getStockInfo.bind({symbol: inputSymbol})" href="#" data-toggle="modal" data-target="#stockInfoModal"></a>
+            </h4>
             <img class="chart" data-bind="attr: { src: chartLink, alt: 'Stock Performance Chart'} ">
         <!-- /ko -->
 
-        <!-- Market trends use case -->
+        <!-- Market trends use case results -->
         <!-- ko if: showStocks -->
             <h4 data-bind="text: 'Trending Stocks ' + selectCollection"></h4>
 
@@ -170,7 +178,7 @@
             </table>
         <!-- /ko -->
 
-        <!-- Parse news use case -->
+        <!-- Parse news use case results -->
         <!-- ko if: showParsed -->
             <h4>Trending News</h4>
 
@@ -204,10 +212,11 @@
             </table>            
         <!-- /ko -->
 
-        <!-- Stock information modal -->
+        <!-- Stock information modal, used by all use cases -->
         <div class="modal fade" id="stockInfoModal" tabindex="-1" role="dialog" aria-labelledby="stockInfoModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
+
                     <div class="modal-header">
                     <!-- ko ifnot: modalLoading -->
                         <h5 class="modal-title" id="stockInfoModalLabel" data-bind="text: modalContent().name + ' (' + modalContent().symbol + ')'"></h5>
@@ -216,6 +225,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                     </div>
+
                     <div class="modal-body">
                         <p data-bind="if: modalLoading">Loading...</p>
                         <!-- ko ifnot: modalLoading -->
@@ -232,6 +242,7 @@
                             </ul>
                         <!-- /ko -->
                     </div>
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
@@ -242,12 +253,11 @@
         <p data-bind="if: loading">Loading...</p>
     </div>
     <br/>
-
 </body>
 
-<footer class="container"><p>Andew Mather n9713671 2020</p></footer>
+<footer class="container"><p>Andew Mather, n9713671, 2020</p></footer>
 
-<!-- JS -->
+<!-- Scripts -->
 <script src="js/jquery-3.5.1.slim.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/knockout-3.5.1.js"></script>

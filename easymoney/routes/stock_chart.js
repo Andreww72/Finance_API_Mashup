@@ -36,6 +36,8 @@ router.get('/:symbol/:frequency/:dataType', (req, res) => {
             xlist.push(key);
             ylist.push(parseFloat(timeData[key][mapTypes[dataType]]).toFixed(2));
         }
+        xlist = xlist.reverse();
+        ylist = ylist.reverse();
 
         // Design chart
         const chartData = {

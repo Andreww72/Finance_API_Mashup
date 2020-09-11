@@ -7,7 +7,16 @@ const ViewModel = function() {
     self.modalLoading = ko.observable(false);
     self.modalContent = ko.observable("");
 
-    // Use case 1 bindings
+    // Chart stock bindings
+    self.frequencies = ['Daily', 'Weekly', 'Monthly'];
+    self.dataTypes = ['Close', 'Open', 'High', 'Low', 'Volume'];
+    self.inputSymbol = "";
+    self.selectFrequency = "Monthly";
+    self.selectDataType = "Close";
+    self.showCharts = ko.observable(false);
+    self.chartLink = ko.observable("");
+
+    // Trending stocks bindings
     self.collections = ['Gains', 'Losses', 'Active', 'Volume', 'Percent'];
     self.limits = [1, 2, 3, 4 ,5];
     self.selectCollection = "";
@@ -18,18 +27,7 @@ const ViewModel = function() {
     self.stocksList = ko.observableArray([]);
     self.newsList = ko.observableArray([]);
 
-    // Use case 3 bindings
-    self.frequencies = ['Daily', 'Weekly', 'Monthly'];
-    self.dataTypes = ['Close', 'Open', 'High', 'Low', 'Volume'];
-    self.timeRange = ['Past Month', 'Past Year', 'Past 2 Years', 'Past 5 Years', 'Past 10 Years', 'Maximum'];
-    self.inputSymbol = "";
-    self.selectFrequency = "Daily";
-    self.selectDataType = "Close";
-    self.selectTimeRange = "Past Year";
-    self.showCharts = ko.observable(false);
-    self.chartLink = ko.observable("");
-
-    // Parse News bindings
+    // Parse news bindings
     self.countries = ['US', 'AU', 'CA', 'CH', 'FR', 'GB', 'HK', 'JP', 'NZ'];
     self.selectCountry = "";
     self.categories = ['Business', 'Entertainment', 'General', 'Health', 'Science', 'Sports', 'Technology'];
@@ -38,7 +36,35 @@ const ViewModel = function() {
     self.parsedList = ko.observableArray([]);
 
 
-    // Clickables
+    // Chart stock use case
+    self.chartStocks = function() {
+        // Ensure correct state
+        self.loading(true);
+        self.showStocks(false);
+        self.showNews(false);
+        self.showParsed(false);
+        self.showCharts(false);
+        
+        // User input already passed through bindings
+        // TODO input validation here
+
+        // Call server route
+        fetch(`/api/chart/${self.inputSymbol}/${self.selectFrequency}/${self.selectDataType}`).then(response => {
+            // Receive server response
+            response.json().then(data => {
+                self.chartLink(data.chart);
+
+                // Allow client to display
+                self.loading(false);
+                self.showCharts(true);
+            });
+        }).catch(error => {
+            console.log('Fetch Error :-S', error);
+        });
+    };
+
+
+    // Market trends use case
     self.getTopStocks = function() {
         // Ensure correct state
         self.stocksList([]);
@@ -63,23 +89,6 @@ const ViewModel = function() {
                 // Allow client to display
                 self.loading(false);
                 self.showStocks(true);
-            });
-        }).catch(error => {
-            console.log('Fetch Error :-S', error);
-        });
-    };
-
-    self.getStockInfo = function(stock) {
-        self.modalLoading(true);
-
-        // Call server route
-        fetch(`/api/stock/symbol/${stock.symbol}`).then(response => {
-            response.json().then(data => {
-                // Receive server response
-                self.modalContent(data);
-
-                // Allow client to display
-                self.modalLoading(false);
             });
         }).catch(error => {
             console.log('Fetch Error :-S', error);
@@ -118,7 +127,7 @@ const ViewModel = function() {
     }
 
 
-    // Use case 2
+    // Parse news use case
     self.parseNews = function() {
         // Ensure correct state
         self.parsedList([]);
@@ -145,28 +154,23 @@ const ViewModel = function() {
     };
 
 
-    // Use case 3
-    self.chartStocks = function() {
-        // Ensure correct state
-        self.loading(true);
-        self.showStocks(false);
-        self.showNews(false);
-        self.showParsed(false);
-        self.showCharts(false);
+    // Multi use case
+    self.getStockInfo = function(stock) {
+        self.modalLoading(true);
         
-        // User input already passed through bindings
-        // TODO input validation here
+        // Handle two possibilities here
+        let symbol = "";
+        if (stock.hasOwnProperty('symbol')) symbol = stock.symbol;
+        else symbol = stock.inputSymbol;
 
         // Call server route
-        fetch(`/api/chart/${self.inputSymbol}/${self.selectFrequency}/${self.selectTimeRange}/${self.selectDataType}`).then(response => {
-            // Receive server response
+        fetch(`/api/stock/symbol/${symbol}`).then(response => {
             response.json().then(data => {
-                self.chartLink(data.chart);
-                console.log(data.chart);
+                // Receive server response
+                self.modalContent(data);
 
                 // Allow client to display
-                self.loading(false);
-                self.showCharts(true);
+                self.modalLoading(false);
             });
         }).catch(error => {
             console.log('Fetch Error :-S', error);
