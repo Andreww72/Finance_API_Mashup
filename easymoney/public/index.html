@@ -28,7 +28,7 @@
 
             <!-- Chart stock use case options -->
             <div class="col-md">
-                <h2>Chart Stock</h2>
+                <h3 class="subheadings">Chart Stock</h2>
                 <p>Displays stock time series chart.</p>
                 <p>Select a stock and charting options:</p>
                 <table>
@@ -47,13 +47,13 @@
                         </tr>
                     </tbody>
                 </table>
-                <br>
+                <br/>
                 <button class="btn btn-primary" data-bind="click: chartStocks, disable: loading">Get stock chart &raquo;</button>
             </div>
 
             <!-- Market trend use case options -->
             <div class="col-md">
-                <h2>Market Trends</h2>
+                <h3 class="subheadings">Market Trends</h2>
                 <p>Finds trending stocks and related news.</p>
                 <p>Select a trend type and amount:</p>
                 <table>
@@ -72,13 +72,13 @@
                         </tr>
                     </tbody>
                 </table>
-                <br>
+                <br/>
                 <button class="btn btn-primary" data-bind="click: getTopStocks, disable: loading">Get trending stocks &raquo;</button>
             </div>
 
             <!-- Parse news use case options -->
             <div class="col-md">
-                <h2>Parse News</h2>
+                <h3 class="subheadings">Parse News</h2>
                 <p>Parse new headlines for company mentions.</p>
                 <p>Select a country and category:</p>
                 <table>
@@ -93,8 +93,8 @@
                         </tr>
                     </tbody>
                 </table>
-                <br><br>
-                <button class="btn btn-primary" data-bind="click: parseNews, disable: loading">Get trending news &raquo;</button>
+                <br/><br/>
+                <button class="btn btn-primary spacer" data-bind="click: parseNews, disable: loading">Get trending news &raquo;</button>
             </div>
         </div>
         <hr>
@@ -104,7 +104,7 @@
     <div class="container">
         <h3>Results</h3>
 
-        <p data-bind="ifnot: showCharts() || showStocks() || showParsed() || loading()">Your results will display here</p>
+        <p data-bind="ifnot: showCharts() || showStocks() || showParsed() || loading() || error()">Your results will display here</p>
         
         <!-- Chart stock use case results -->
         <!-- ko if: showCharts -->
@@ -112,12 +112,12 @@
                 Stock Chart for 
                 <a data-bind="text: inputSymbol, click: getStockInfo.bind({symbol: inputSymbol})" href="#" data-toggle="modal" data-target="#stockInfoModal"></a>
             </h4>
-            <img class="chart" data-bind="attr: { src: chartLink, alt: 'Stock Performance Chart'} ">
+            <img class="chart" data-bind="attr: { src: chartLink, alt: `Stock Performance Chart`} ">
         <!-- /ko -->
 
         <!-- Market trends use case results -->
         <!-- ko if: showStocks -->
-            <h4 data-bind="text: 'Trending Stocks ' + selectCollection"></h4>
+            <h4 data-bind="text: "Trending Stocks " + selectCollection"></h4>
 
             <table class="table">
                 <thead>
@@ -197,7 +197,7 @@
                         <td>
                             <!-- ko foreach: symbolMatches -->
                                 <a data-bind="text: symbol, click: $parents[1].getStockInfo" href="#" data-toggle="modal" data-target="#stockInfoModal"></a>
-                                <br>
+                                <br/>
                             <!-- /ko -->
                         </td>
                         <td><img class="articleImg" data-bind="attr: { src: urlToImage, alt: 'Article cover image' }"></td>
@@ -251,6 +251,7 @@
         </div>
 
         <p data-bind="if: loading">Loading...</p>
+        <p data-bind="if: error">Error occurred, please check your inputs</p>
     </div>
     <br/>
 </body>

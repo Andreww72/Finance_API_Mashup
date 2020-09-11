@@ -1,14 +1,14 @@
-const express = require('express');
-const logger = require('morgan');
-const axios = require('axios');
-const api = require('../api_data');
+const express = require("express");
+const logger = require("morgan");
+const axios = require("axios");
+const api = require("../api_data");
 
 const router = express.Router();
-router.use(logger('tiny'));
+router.use(logger("tiny"));
 
 
 // Route for use case finding trending stocks and associated news, trending stocks component
-router.get('/list/:list/:listLimit', (req, res) => {
+router.get("/list/:list/:listLimit", (req, res) => {
     // Handle parameters and construct url for desired stock data
     const mapList = {Gains: "gainers", Losses: "losers", Active: "mostactive", Volume: "iexvolume", Percent: "iexpercent"};
     const listLimit = req.params.listLimit;
@@ -37,7 +37,7 @@ router.get('/list/:list/:listLimit', (req, res) => {
 
         // Return data to client
         res.statusCode = 200; 
-        res.setHeader('Content-Type', 'application/json');
+        res.setHeader("Content-Type", "application/json");
         res.end(JSON.stringify(resData));
 
     }).catch(error => {
@@ -48,7 +48,7 @@ router.get('/list/:list/:listLimit', (req, res) => {
 });
 
 // Route for use case finding trending stocks and associated news, news component
-router.get('/news/:search/:articleLimit', (req, res) => {
+router.get("/news/:search/:articleLimit", (req, res) => {
     // Handle parameters and construct url for desired news search
     const search = req.params.search;
     const url = `${api.newsApi.hostname}${api.newsApi.path_search}?q=${search}&apiKey=${api.newsApi.key}`;
@@ -59,7 +59,7 @@ router.get('/news/:search/:articleLimit', (req, res) => {
         const data = response.data;
 
         let formattedNews = [];
-        if (data.status === 'ok') {
+        if (data.status === "ok") {
             for (let j in data.articles) {
                 // Limit to number of articles per stock user selected
                 if (j >= req.params.articleLimit) break;
@@ -76,7 +76,7 @@ router.get('/news/:search/:articleLimit', (req, res) => {
 
         // Return data to client
         res.statusCode = 200; 
-        res.setHeader('Content-Type', 'application/json');
+        res.setHeader("Content-Type", "application/json");
         res.end(JSON.stringify(formattedNews));
 
     }).catch(error => {
@@ -87,7 +87,7 @@ router.get('/news/:search/:articleLimit', (req, res) => {
 });
 
 // Route for displaying additional company description + stats in client modal
-router.get('/symbol/:symbol', (req, res) => {
+router.get("/symbol/:symbol", (req, res) => {
     // Handle parameters and construct url for desired symbol data
     const symbol = req.params.symbol;
     const url = `${api.alphaAdv.hostname}${api.alphaAdv.path}function=OVERVIEW&symbol=${symbol}&apikey=${api.alphaAdv.key}`;
@@ -113,7 +113,7 @@ router.get('/symbol/:symbol', (req, res) => {
 
         // Return data to client
         res.statusCode = 200; 
-        res.setHeader('Content-Type', 'application/json');
+        res.setHeader("Content-Type", "application/json");
         res.end(JSON.stringify(resData));
 
     }).catch(error => {
