@@ -2,13 +2,15 @@ const express = require('express');
 const logger = require('morgan');
 const axios = require('axios');
 const api = require('../api_data');
-const findWord = require('most-common-words-by-language');
+const { findWord } = require('most-common-words-by-language');
 
 const router = express.Router();
 router.use(logger('tiny'));
 
 
+// Route for use case parsing trending news, and finding associated company information
 router.get('/:country/:category', (req, res) => {
+    // Handle parameters and construct url for retrieving recent headines
     const country = req.params.country.toLowerCase();
     const category = req.params.category.toLowerCase();
     const url = `${api.newsApi.hostname}${api.newsApi.path_top}?country=${country}&category=${category}&apiKey=${api.newsApi.key}`;
@@ -32,19 +34,9 @@ router.get('/:country/:category', (req, res) => {
                 for (let j in words) {
                     let word = words[j];
                     let firstLetter = word[0];
-                    
+
                     // Remove words with punctuation, real words, extra short
-                    if (word.length < 2 || !firstLetter.match(/[a-z]/i) ||
-                        word.includes("'") || word.includes("$") ||
-                        word.includes("(") || word.includes(")") ||
-                        word.includes("?") || word.includes("!") ||
-                        word.includes(".") || word.includes(",") ||
-                        word.includes("'") || word.includes('"') ||
-                        word.includes("/") || word.includes('’') ||
-                        word.includes(":") || word.includes("%")) {
-                        continue;
-                    }
-                    if (findWord(word).hasOwnProperty('english')) continue;
+                    if (removeWord(word)) continue;
 
                     // Find remaining words that contain a capital letter
                     for (let k in word) {
@@ -64,7 +56,7 @@ router.get('/:country/:category', (req, res) => {
                 }
                 articles[i].symbolMatches = symbolMatches;
 
-                // Only return articles that had a match (with the match + stock info)
+                // Only return articles with a match
                 if (symbolMatches.length > 0) {
                     resArticles.push(articles[i]);
                 }
@@ -79,14 +71,34 @@ router.get('/:country/:category', (req, res) => {
     });
 });
 
+// Check if a word shouldn't be considered as a possible company name
+// Excluded if includes unusual punctuation, too short, not alphabetical, a common English word.
+function removeWord(word) {
+    if (word.length < 2 || !firstLetter.match(/[a-z]/i)) return true;
+    if (word.includes("'") || word.includes("$") ||
+    word.includes("(") || word.includes(")") ||
+    word.includes("?") || word.includes("!") ||
+    word.includes(".") || word.includes(",") ||
+    word.includes("'") || word.includes('"') ||
+    word.includes("/") || word.includes('’') ||
+    word.includes(":") || word.includes("%")) return true;
+    if (findWord(word).hasOwnProperty('english')) return true;
+    return false;
+}
+
+// Use Yahoo Finance API to convert a company name to symbol
 async function getCompanySymbol(name) {
     const url = `${api.yahooFin.hostname}${api.yahooFin.path}?query=${name}&region=1&lang=en&callback=YAHOO.Finance.SymbolSuggest.ssCallback`
     try {
         const response = await axios.get(url);
         let data = response.data;
+
+        // Data is returned as a string, process into suitable JSON
         data = data.split("YAHOO.Finance.SymbolSuggest.ssCallback(")[1];
         data = data.substring(0, data.length - 2);
         data = JSON.parse(data);
+
+        // Return result if there was one
         if (data.ResultSet.Result.length === 0) return null;
         else return data.ResultSet.Result[0].symbol;
 
