@@ -26,11 +26,19 @@ const ViewModel = function() {
     self.selectCurrency = "";
 
     self.showParsed = ko.observable(false);
-    self.parsedList = ko.observableArray([
-        {title: 'Stock listing A', date: "05/09/2020"},
-        {title: 'Stock listing B', date: "06/09/2020"},
-        {title: 'Stock listing C', date: "07/09/2020"}
-    ]);
+    self.parsedList = ko.observableArray([]);
+
+    // Use case 3 bindings
+    self.frequencies = ['Daily', 'Weekly', 'Monthly'];
+    self.dataTypes = ['Close', 'Open', 'High', 'Low', 'Volume'];
+    self.timeRange = ['Past Month', 'Past Year', 'Past 2 Years', 'Past 5 Years', 'Past 10 Years', 'Maximum'];
+    self.inputSymbol = "";
+    self.selectFrequency = "Daily";
+    self.selectDataType = "Close";
+    self.selectTimeRange = "Past Year";
+    self.showCharts = ko.observable(false);
+    self.chartLink = ko.observable("");
+
 
     // Clickables
     self.getTopStocks = function() {
@@ -41,6 +49,7 @@ const ViewModel = function() {
         self.showStocks(false);
         self.showNews(false);
         self.showParsed(false);
+        self.showCharts(false);
 
         // User input already passed through bindings
         // Call server route
@@ -118,6 +127,7 @@ const ViewModel = function() {
         self.showStocks(false);
         self.showNews(false);
         self.showParsed(false);
+        self.showCharts(false);
         
         // User input already passed through bindings
         // Call server route
@@ -125,7 +135,7 @@ const ViewModel = function() {
             response.json().then(data => {
                 // Receive server response
                 self.parsedList(data);
-                console.log(self.parsedList());
+
                 // Allow client to display
                 self.loading(false);
                 self.showParsed(true);
@@ -133,7 +143,35 @@ const ViewModel = function() {
         }).catch(error => {
             console.log('Fetch Error :-S', error);
         });
+    };
 
+
+    // Use case 3
+    self.chartStocks = function() {
+        // Ensure correct state
+        self.loading(true);
+        self.showStocks(false);
+        self.showNews(false);
+        self.showParsed(false);
+        self.showCharts(false);
+        
+        // User input already passed through bindings
+        // TODO input validation here
+
+        // Call server route
+        fetch(`/api/chart/${self.inputSymbol}/${self.selectFrequency}/${self.selectDataType}`).then(response => {
+            // Receive server response
+            response.json().then(data => {
+                self.chartLink(data.chart);
+                console.log(data.chart);
+
+                // Allow client to display
+                self.loading(false);
+                self.showCharts(true);
+            });
+        }).catch(error => {
+            console.log('Fetch Error :-S', error);
+        });
     };
 };
 
