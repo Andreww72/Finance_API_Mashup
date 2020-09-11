@@ -63,7 +63,8 @@ const ViewModel = function() {
                         self.loading(false);
 
                     } else {
-                        self.chartLink(data.chart);
+                        // Include cache breaker on new image link to force image refresh on subsequent calls
+                        self.chartLink(data.chart + "?" + new Date().getTime());
 
                         // Allow client to display
                         self.loading(false);
