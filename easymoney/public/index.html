@@ -26,31 +26,6 @@
     <div class="container">
         <div class="row">
 
-            <!-- Chart stock use case options -->
-            <div class="col-md">
-                <h3 class="subheadings">Chart Stock</h2>
-                <p>Displays stock time series chart.</p>
-                <p>Select a stock and charting options:</p>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td><label class="tableLabel">Symbol:</label></td>
-                            <td><input class="list" data-bind="value: inputSymbol" placeholder="AAPL"></select></td>
-                        </tr>
-                        <tr>
-                            <td><label class="tableLabel">Frequency:</label></td>
-                            <td><select class="list" data-bind="options: frequencies, value: selectFrequency"></select></td>
-                        </tr>
-                        <tr>
-                            <td><label class="tableLabel">Data type:</label></td>
-                            <td><select class="list" data-bind="options: dataTypes, value: selectDataType"></select></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <br/>
-                <button class="btn btn-primary" data-bind="click: chartStocks, disable: loading">Get stock chart &raquo;</button>
-            </div>
-
             <!-- Market trend use case options -->
             <div class="col-md">
                 <h3 class="subheadings">Market Trends</h2>
@@ -96,6 +71,32 @@
                 <br/><br/>
                 <button class="btn btn-primary spacer" data-bind="click: parseNews, disable: loading">Get trending news &raquo;</button>
             </div>
+
+            <!-- Chart stock use case options -->
+            <div class="col-md">
+                <h3 class="subheadings">Chart Stock</h2>
+                <p>Displays stock time series chart.</p>
+                <p>Select a stock and charting options:</p>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><label class="tableLabel">Symbol:</label></td>
+                            <td><input class="list" data-bind="value: inputSymbol" placeholder="AAPL"></select></td>
+                        </tr>
+                        <tr>
+                            <td><label class="tableLabel">Frequency:</label></td>
+                            <td><select class="list" data-bind="options: frequencies, value: selectFrequency"></select></td>
+                        </tr>
+                        <tr>
+                            <td><label class="tableLabel">Data type:</label></td>
+                            <td><select class="list" data-bind="options: dataTypes, value: selectDataType"></select></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br/>
+                <button class="btn btn-primary" data-bind="click: chartStocks, disable: loading">Get stock chart &raquo;</button>
+            </div>
+
         </div>
         <hr>
     </div>
@@ -104,16 +105,7 @@
     <div class="container">
         <h3>Results</h3>
 
-        <p data-bind="ifnot: showCharts() || showStocks() || showParsed() || loading() || error()">Your results will display here</p>
-        
-        <!-- Chart stock use case results -->
-        <!-- ko if: showCharts -->
-            <h4>
-                Stock Chart for 
-                <a data-bind="text: inputSymbol, click: getStockInfo.bind({symbol: inputSymbol})" href="#" data-toggle="modal" data-target="#stockInfoModal"></a>
-            </h4>
-            <img class="chart" data-bind="attr: { src: chartLink, alt: `Stock Performance Chart`} ">
-        <!-- /ko -->
+        <p data-bind="ifnot: showStocks() || showParsed() || showCharts() || loading() || dataError() || connError()">Your results will display here</p>
 
         <!-- Market trends use case results -->
         <!-- ko if: showStocks -->
@@ -212,6 +204,15 @@
             </table>            
         <!-- /ko -->
 
+        <!-- Chart stock use case results -->
+        <!-- ko if: showCharts -->
+            <h4>
+                Stock Chart for 
+                <a data-bind="text: inputSymbol, click: getStockInfo.bind({symbol: inputSymbol})" href="#" data-toggle="modal" data-target="#stockInfoModal"></a>
+            </h4>
+            <img class="chart" data-bind="attr: { src: chartLink, alt: `Stock Performance Chart`} ">
+        <!-- /ko -->
+
         <!-- Stock information modal, used by all use cases -->
         <div class="modal fade" id="stockInfoModal" tabindex="-1" role="dialog" aria-labelledby="stockInfoModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -254,7 +255,8 @@
         </div>
 
         <p data-bind="if: loading">Loading...</p>
-        <p data-bind="if: error">Error occurred, please check your inputs</p>
+        <p data-bind="if: dataError">Error occurred, please check your inputs</p>
+        <p data-bind="if: connError">Error occurred, please check your network</p>
     </div>
     <br/>
 </body>

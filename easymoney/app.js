@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Setup application routes
 app.use("/", indexRouter);
 app.use("/api/stock", apiStockNews);
-app.use("/api/chart", apiStockChart);
 app.use("/api/parse", apiNewsParse);
+app.use("/api/chart", apiStockChart);
 
 module.exports = app;

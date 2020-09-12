@@ -4,19 +4,11 @@ const ViewModel = function() {
 
     // General bindings
     self.loading = ko.observable(false);
-    self.error = ko.observable(false);
+    self.dataError = ko.observable(false);
+    self.connError = ko.observable(false);
     self.modalLoading = ko.observable(false);
     self.modalContent = ko.observable("");
     self.modalError = ko.observable(false);
-
-    // Chart stock bindings
-    self.frequencies = ["Daily", "Weekly", "Monthly"];
-    self.dataTypes = ["Close", "Open", "High", "Low", "Volume"];
-    self.inputSymbol = "";
-    self.selectFrequency = "Monthly";
-    self.selectDataType = "Close";
-    self.showCharts = ko.observable(false);
-    self.chartLink = ko.observable("");
 
     // Trending stocks bindings
     self.collections = ["Gains", "Losses", "Active", "Volume", "Percent"];
@@ -37,51 +29,14 @@ const ViewModel = function() {
     self.showParsed = ko.observable(false);
     self.parsedList = ko.observableArray([]);
 
-
-    // Chart stock use case
-    self.chartStocks = function() {
-        // Ensure correct state
-        self.loading(true);
-        self.error(false);
-        self.showStocks(false);
-        self.showNews(false);
-        self.showParsed(false);
-        self.showCharts(false);
-        
-        // User input already passed through bindings
-        // TODO input validation here
-        if (self.inputSymbol.match(/^[A-Za-z]+$/)) {
-
-            // Call server route
-            fetch(`/api/chart/${self.inputSymbol}/${self.selectFrequency}/${self.selectDataType}`).then(response => {
-
-                // Receive server response
-                response.json().then(data => {
-                    if (data.hasOwnProperty("error")) {
-                        console.log("Input error");
-                        self.error(true);
-                        self.loading(false);
-
-                    } else {
-                        // Include cache breaker on new image link to force image refresh on subsequent calls
-                        self.chartLink(data.chart + "?" + new Date().getTime());
-
-                        // Allow client to display
-                        self.loading(false);
-                        self.showCharts(true);
-                    }
-                });
-            }).catch(error => {
-                console.log("Fetch Error :-S", error);
-                self.error(true);
-                self.loading(false);
-            });
-        } else {
-            console.log("Input error");
-            self.error(true);
-            self.loading(false);
-        }
-    };
+    // Chart stock bindings
+    self.frequencies = ["Daily", "Weekly", "Monthly"];
+    self.dataTypes = ["Close", "Open", "High", "Low", "Volume"];
+    self.inputSymbol = "";
+    self.selectFrequency = "Monthly";
+    self.selectDataType = "Close";
+    self.showCharts = ko.observable(false);
+    self.chartLink = ko.observable("");
 
 
     // Market trends use case
@@ -90,7 +45,8 @@ const ViewModel = function() {
         self.stocksList([]);
         self.newsList([]);
         self.loading(true);
-        self.error(false);
+        self.dataError(false);
+        self.connError(false);
         self.showStocks(false);
         self.showNews(false);
         self.showParsed(false);
@@ -99,12 +55,16 @@ const ViewModel = function() {
         // User input already passed through bindings
         // Call server route
         fetch(`/api/stock/list/${self.selectCollection}/${self.selectStockLimit}`).then(response => {
+            // Check status code
             if (response.status !== 200) {
                 console.log("Issue encountered. Status Code: " + response.status);
+                self.connError(true);
+                self.loading(false);
                 return;
             }
+
+            // Receive server response/data
             response.json().then(data => {
-                // Receive server response
                 self.stocksList(data);
 
                 // Allow client to display
@@ -113,7 +73,7 @@ const ViewModel = function() {
             });
         }).catch(error => {
             console.log("Fetch Error :-S", error);
-            self.error(true);
+            self.dataError(true);
             self.loading(false);
         });
     };
@@ -124,12 +84,16 @@ const ViewModel = function() {
         // User input already passed through bindings
         // Call server route
         fetch(`/api/stock/news/${stock.name}/${self.selectArticleLimit}`).then(response => {
+            // Check status code
             if (response.status !== 200) {
                 console.log("Issue encountered. Status Code: " + response.status);
+                self.connError(true);
+                self.loading(false);
                 return;
             }
+
+            // Receive server response/data
             response.json().then(data => {
-                // Receive server response
                 for (let i in data) {
                     data[i].name = stock.name;
                     self.newsList.push(data[i]);
@@ -141,7 +105,7 @@ const ViewModel = function() {
             });
         }).catch(error => {
             console.log("Fetch Error :-S", error);
-            self.error(true);
+            self.dataError(true);
             self.loading(false);
         });
     };
@@ -157,7 +121,8 @@ const ViewModel = function() {
         // Ensure correct state
         self.parsedList([]);
         self.loading(true);
-        self.error(false);
+        self.dataError(false);
+        self.connError(false);
         self.showStocks(false);
         self.showNews(false);
         self.showParsed(false);
@@ -166,8 +131,16 @@ const ViewModel = function() {
         // User input already passed through bindings
         // Call server route
         fetch(`/api/parse/${self.selectCountry.toLowerCase()}/${self.selectCategory.toLowerCase()}`).then(response => {
+            // Check status code
+            if (response.status !== 200) {
+                console.log("Issue encountered. Status Code: " + response.status);
+                self.connError(true);
+                self.loading(false);
+                return;
+            }
+
+            // Receive server response/data
             response.json().then(data => {
-                // Receive server response
                 self.parsedList(data);
 
                 // Allow client to display
@@ -176,11 +149,62 @@ const ViewModel = function() {
             });
         }).catch(error => {
             console.log("Fetch Error :-S", error);
-            self.error(true);
+            self.dataError(true);
             self.loading(false);
         });
     };
 
+    // Chart stock use case
+    self.chartStocks = function() {
+        // Ensure correct state
+        self.loading(true);
+        self.dataError(false);
+        self.connError(false);
+        self.showStocks(false);
+        self.showNews(false);
+        self.showParsed(false);
+        self.showCharts(false);
+        
+        // User input already passed through bindings
+        // TODO input validation here
+        if (self.inputSymbol.match(/^[A-Za-z]+$/)) {
+
+            // Call server route
+            fetch(`/api/chart/${self.inputSymbol}/${self.selectFrequency}/${self.selectDataType}`).then(response => {
+                // Check status code
+                if (response.status !== 200) {
+                    console.log("Issue encountered. Status Code: " + response.status);
+                    self.connError(true);
+                    self.loading(false);
+                    return;
+                }
+                // Receive server response/data
+                response.json().then(data => {
+                    if (data.hasOwnProperty("error")) {
+                        console.log("Input error");
+                        self.dataError(true);
+                        self.loading(false);
+
+                    } else {
+                        // Include cache breaker on new image link to force image refresh on subsequent calls
+                        self.chartLink(data.chart + "?" + new Date().getTime());
+
+                        // Allow client to display
+                        self.loading(false);
+                        self.showCharts(true);
+                    }
+                });
+            }).catch(error => {
+                console.log("Fetch Error :-S", error);
+                self.dataError(true);
+                self.loading(false);
+            });
+        } else {
+            console.log("Input error");
+            self.dataError(true);
+            self.loading(false);
+        }
+    };
 
     // Multi use case
     self.getStockInfo = function(stock) {
@@ -194,8 +218,16 @@ const ViewModel = function() {
 
         // Call server route
         fetch(`/api/stock/symbol/${symbol}`).then(response => {
+            // Check status code
+            if (response.status !== 200) {
+                console.log("Issue encountered. Status Code: " + response.status);
+                self.dataError(true);
+                self.loading(false);
+                return;
+            }
+
+            // Receive server response/data
             response.json().then(data => {
-                // Receive server response
                 if (data.hasOwnProperty('error')) {
                     self.modalError(true);
                     self.modalContent({error: data.error});
@@ -208,7 +240,7 @@ const ViewModel = function() {
             });
         }).catch(error => {
             console.log("Fetch Error :-S", error);
-            self.error(true);
+            self.dataError(true);
             self.loading(false);
         });
     };
