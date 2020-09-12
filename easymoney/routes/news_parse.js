@@ -7,6 +7,18 @@ const { findWord } = require('most-common-words-by-language');
 const router = express.Router();
 router.use(logger('tiny'));
 
+// News parsing use case requires:
+//   1) News API
+//   2) Yahoo Finance API
+//   3) Alpha Advantage API
+
+// News parsing use case process:
+//   User selects news country and category
+//   First API fetches corresponding headlines
+//   Titles are parsed for company names
+//   Second API converts company name to stock symbol
+//   Third API retrieves stock information with symbol 
+//   Display table to user with news / related companies (optional link to further stock detail)
 
 // Route for use case parsing trending news, and finding associated company information
 router.get('/:country/:category', (req, res) => {

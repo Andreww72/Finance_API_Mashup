@@ -24,12 +24,14 @@ const newsApi = {
 
 // Quick Chart IO API (produce charts)
 const quickChart = {
+    // No key required
     hostname: "https://quickchart.io",
     path: "/chart"
 }
 
 // Yahoo Finance API (stock name to symbol)
 const yahooFin = {
+    // No key required
     hostname: "http://d.yimg.com/autoc.finance.yahoo.com",
     path: "/autoc"
 }

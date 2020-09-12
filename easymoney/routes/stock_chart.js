@@ -7,6 +7,15 @@ const apis = require("../api_data");
 const router = express.Router();
 router.use(logger("tiny"));
 
+// Stock charting use case requires:
+//   1) Alpha Advantage API
+//   2) QuickChartIO API
+
+// Stock charting use case process:
+//   User inputs a stock symbol
+//   First API fetches stock data
+//   Second API charts retrieved data
+//   Display chart to user with optional link to further stock detail
 
 // Route for use case showing stock charts
 router.get("/:symbol/:frequency/:dataType", (req, res) => {

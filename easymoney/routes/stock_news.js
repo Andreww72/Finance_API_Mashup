@@ -6,6 +6,18 @@ const api = require("../api_data");
 const router = express.Router();
 router.use(logger("tiny"));
 
+// Stock news use case requires:
+//   1) IEX Cloud API
+//   2) News API
+//   3) Alpha Advantage API
+
+// Stock news use case process:
+//   User selects a trend type (e.g. top gains, most active ...)
+//   First API fetches top 'n' stocks for the trend
+//   Display table to user with stocks and some information
+//   User can select show news by stock/company
+//   Second API searches for news on a stock
+//   Display new table to user with news articles
 
 // Route for use case finding trending stocks and associated news, trending stocks component
 router.get("/list/:list/:listLimit", (req, res) => {
