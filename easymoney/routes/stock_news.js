@@ -25,7 +25,7 @@ router.get("/list/:list/:listLimit", (req, res) => {
     const mapList = {Gains: "gainers", Losses: "losers", Active: "mostactive", Volume: "iexvolume", Percent: "iexpercent"};
     const listLimit = req.params.listLimit;
     const listType = mapList[req.params.list]
-    const url = `${api.iexCloud.hostname_test}${api.iexCloud.path_list}${listType}?token=${api.iexCloud.key_test}&listLimit=${listLimit}`;
+    const url = `${api.iexCloud.hostname_prod}${api.iexCloud.path_list}${listType}?token=${api.iexCloud.key_prod}&listLimit=${listLimit}`;
 
     // Call IEX Cloud API for trending stock list data
     axios.get(url).then(response => {
