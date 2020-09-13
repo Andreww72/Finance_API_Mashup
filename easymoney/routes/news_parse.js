@@ -38,8 +38,9 @@ router.get('/:country/:category', (req, res) => {
             for (let i in articles) {
                 // Parse article
                 articles[i].source = articles[i].source.name;
-                const title = articles[i].title;
-                const words = title.split(" ");
+                const description = articles[i].description;
+                if (description === null) continue; 
+                const words = description.split(" ");
                 let articleMatches = [];
                 
                 // Find words that contain a capital letter
@@ -53,7 +54,7 @@ router.get('/:country/:category', (req, res) => {
                     for (let k in word) {
                         const letter = word[0];
 
-                        if (letter == letter.toUpperCase()) {
+                        if (letter === letter.toUpperCase() && !articleMatches.includes(word)) {
                             articleMatches.push(word);
                             break;
                         }
@@ -63,7 +64,7 @@ router.get('/:country/:category', (req, res) => {
                 let symbolMatches = [];
                 for (let j in articleMatches) {
                     let symbol = await getCompanySymbol(articleMatches[j]);
-                    if (symbol && !symbol.includes(".") && symbol.length > 2) symbolMatches.push({"symbol": symbol});
+                    if (symbol && !symbol.includes(".") && symbol.length > 2 && symbol.length < 5) symbolMatches.push({"symbol": symbol});
                 }
                 articles[i].symbolMatches = symbolMatches;
 
