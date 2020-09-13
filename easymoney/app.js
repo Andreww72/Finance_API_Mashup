@@ -3,10 +3,9 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const path = require("path");
 
-const indexRouter = require("./routes/index");
-const apiStockNews = require("./routes/stock_news");
-const apiStockChart = require("./routes/stock_chart");
+const apiMarketTrends = require("./routes/market_trends");
 const apiNewsParse = require("./routes/news_parse");
+const apiStockChart = require("./routes/stock_chart");
 
 // Setup application
 const app = express();
@@ -17,12 +16,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Setup application routes
-app.use("/api/stock", apiStockNews);
+app.use("/api/stock", apiMarketTrends);
 app.use("/api/parse", apiNewsParse);
 app.use("/api/chart", apiStockChart);
 
 // Home page doesn't need a separate router
-router.get("/", function(req, res, next) {
+app.get("/", function(req, res, next) {
     res.render("index", { title: "Express" });
 });
 

@@ -10,7 +10,7 @@ const ViewModel = function() {
     self.modalContent = ko.observable("");
     self.modalError = ko.observable(false);
 
-    // Trending stocks bindings
+    // Market trends bindings
     self.collections = ["Gains", "Losses", "Active", "Volume"];
     self.limits = [1, 2, 3, 4 ,5];
     self.selectCollection = "";

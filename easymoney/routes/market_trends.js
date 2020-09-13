@@ -6,12 +6,12 @@ const api = require("../api_config");
 const router = express.Router();
 router.use(logger("tiny"));
 
-// Stock news use case requires:
+// Market trends use case requires:
 //   1) IEX Cloud API
 //   2) News API
 //   3) Alpha Advantage API
 
-// Stock news use case process:
+// Market trends use case process:
 //   User selects a trend type (e.g. top gains, most active ...)
 //   First API fetches top 'n' stocks for the trend
 //   Display table to user with stocks and some information
