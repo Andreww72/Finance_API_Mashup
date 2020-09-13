@@ -11,7 +11,7 @@ const ViewModel = function() {
     self.modalError = ko.observable(false);
 
     // Trending stocks bindings
-    self.collections = ["Gains", "Losses", "Active", "Volume", "Percent"];
+    self.collections = ["Gains", "Losses", "Active", "Volume"];
     self.limits = [1, 2, 3, 4 ,5];
     self.selectCollection = "";
     self.selectStockLimit = "";
@@ -208,6 +208,7 @@ const ViewModel = function() {
 
     // Multi use case
     self.getStockInfo = function(stock) {
+        // Ensure correct state
         self.modalLoading(true);
         self.modalError(false);
 
@@ -246,7 +247,7 @@ const ViewModel = function() {
     };
 };
 
-// Create view model and bindings
+// Create view model and apply bindings
 $(function() {
     "use strict";
 	ko.applyBindings(new ViewModel());

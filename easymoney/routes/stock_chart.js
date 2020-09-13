@@ -2,7 +2,7 @@ const express = require("express");
 const logger = require("morgan");
 const axios = require("axios");
 const fs = require("fs");
-const apis = require("../api_data");
+const apis = require("../api_config");
 
 const router = express.Router();
 router.use(logger("tiny"));

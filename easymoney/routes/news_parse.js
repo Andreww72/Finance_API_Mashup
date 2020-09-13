@@ -1,7 +1,7 @@
 const express = require('express');
 const logger = require('morgan');
 const axios = require('axios');
-const api = require('../api_data');
+const api = require('../api_config');
 const { findWord } = require('most-common-words-by-language');
 
 const router = express.Router();

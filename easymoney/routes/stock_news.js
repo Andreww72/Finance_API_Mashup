@@ -1,7 +1,7 @@
 const express = require("express");
 const logger = require("morgan");
 const axios = require("axios");
-const api = require("../api_data");
+const api = require("../api_config");
 
 const router = express.Router();
 router.use(logger("tiny"));
@@ -50,7 +50,7 @@ router.get("/list/:list/:listLimit", (req, res) => {
                 item.time = data[i].latestTime;
                 item.volume = data[i].volume;
                 item.change = data[i].change;
-                item.changePercent = data[i].changePercent * 100;
+                item.changePercent = (data[i].changePercent * 100).toFixed(2);
                 resData.push(item);
             }
 

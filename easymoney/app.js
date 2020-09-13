@@ -17,9 +17,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Setup application routes
-app.use("/", indexRouter);
 app.use("/api/stock", apiStockNews);
 app.use("/api/parse", apiNewsParse);
 app.use("/api/chart", apiStockChart);
+
+// Home page doesn't need a separate router
+router.get("/", function(req, res, next) {
+    res.render("index", { title: "Express" });
+});
 
 module.exports = app;
