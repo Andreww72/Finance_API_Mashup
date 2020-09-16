@@ -217,12 +217,12 @@
                 <div class="modal-content">
 
                     <div class="modal-header">
-                    <!-- ko ifnot: modalLoading() || modalError() -->
-                        <h5 class="modal-title" id="stockInfoModalLabel" data-bind="text: modalContent().name + ' (' + modalContent().symbol + ')'"></h5>
-                    <!-- /ko -->
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                        <!-- ko ifnot: modalLoading() || modalError() -->
+                            <h5 class="modal-title" id="stockInfoModalLabel" data-bind="text: modalContent().name + ' (' + modalContent().symbol + ')'"></h5>
+                        <!-- /ko -->
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
 
                     <div class="modal-body">
@@ -241,7 +241,7 @@
                             </ul>
                         <!-- /ko -->
                         <!-- ko if: modalError -->
-                        <p data-bind="text: modalContent().error"></p>
+                            <p data-bind="text: modalContent().error"></p>
                         <!-- /ko -->
                     </div>
 

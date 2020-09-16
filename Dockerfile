@@ -14,7 +14,7 @@ RUN apt-get -y install nodejs
 # Copy the application folder inside the container
 ADD /easymoney /easymoney
 
-# Expose ports
+# Expose port
 EXPOSE 3000
 
 # Set default CMD directory
